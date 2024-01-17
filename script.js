@@ -1,9 +1,41 @@
 const GAME_OPTIONS = ['Rock', 'Paper', 'Scissors'];
 
-let playerScore = 0;
-let computerScore = 0;
+class Game {
+  constructor() {
+    this.round = 1;
+    this.playerScore = 0;
+    this.computerScore = 0;
+  }
 
-let gameColor = '#c965b9';
+  removeFront() {
+    startGameButton.classList.add('removing');
+    quote.classList.add('removing');
+    header.classList.add('removing');
+
+    setTimeout(() => {
+      startGameButton.remove();
+      quote.remove();
+      header.remove()
+    }, 500);
+  }
+ 
+}
+
+let game = new Game();
+
+const startGameButton = document.querySelector('#start-game');
+const quote = document.querySelector('#quote');
+const header = document.querySelector('header');
+
+startGameButton.addEventListener('mousedown', () => startGameButton.classList.add('clicked'));
+startGameButton.addEventListener('mouseup', () => startGameButton.classList.remove('clicked'));
+startGameButton.addEventListener('click', () => {
+  game = new Game();
+  game.removeFront();
+});
+
+
+
 
 let style = document.createElement('style');
 let gameControlClass =
@@ -107,7 +139,7 @@ title.addEventListener('click', () => {
 
 wrapper.appendChild(title);
 
-document.body.appendChild(wrapper);
+//document.body.appendChild(wrapper);
 
 function getComputerChoice() {
 
@@ -181,9 +213,11 @@ function resolveRound(result, playerSelection, computerSelection) {
   score.textContent = `${playerScore} - ${computerScore}`;
 }
 
+/*
 function newGame() {
 
   playerScore = 0;
   computerScore = 0;
 }
+*/
 
