@@ -1,38 +1,201 @@
 const GAME_OPTIONS = ['Rock', 'Paper', 'Scissors'];
 
-class Game {
+class GameLogic {
+  #round;
+  #playerScore;
+  #computerScore;
+
   constructor() {
-    this.round = 1;
-    this.playerScore = 0;
-    this.computerScore = 0;
+    this.#round = 1;
+    this.#playerScore = 0;
+    this.#computerScore = 0;
+  }
+
+  getRound() {
+    return this.#round;
+  }
+
+  setRound(value) {
+    this.#round = value;
+  }
+
+  getPlayerScore() {
+    return this.#playerScore;
+  }
+
+  setPlayerScore(value) {
+    this.#playerScore = value;
+  }
+
+  getComputerScore() {
+    return this.#computerScore;
+  }
+
+  setComputerScore(value) {
+    this.#computerScore = value;
+  }
+}
+
+class GameUI {
+  #gameLogic;
+
+  constructor(gameLogic) {
+    this.#gameLogic = gameLogic;
+    this.startGameButton = document.querySelector('#start-game');
+    this.quote = document.querySelector('#quote');
+    this.header = document.querySelector('header');
+    this.rpsTitle = document.querySelector('#rpsTitle');
   }
 
   removeFront() {
-    startGameButton.classList.add('removing');
-    quote.classList.add('removing');
-    header.classList.add('removing');
+    this.startGameButton.classList.add('front-remove');
+    this.quote.classList.add('front-remove');
+    this.rpsTitle.classList.add('front-remove');
 
     setTimeout(() => {
-      startGameButton.remove();
-      quote.remove();
-      header.remove()
+      this.startGameButton.remove();
+      this.quote.remove();
+      this.rpsTitle.remove();
     }, 500);
   }
- 
+
+  appendRoundInfo() {
+    this.roundInfo = document.createElement('h2');
+    this.roundInfo.classList.add('addable');
+    this.roundInfo.textContent = `Round ${this.#gameLogic.getRound()}`;
+
+    setTimeout(() => this.header.appendChild(this.roundInfo), 500);
+    setTimeout(() => this.roundInfo.classList.add('game-append'), 1000);
+  }
+
+  appendPlayPage() {
+    this.main = document.querySelector('main');
+    this.playPage = document.createElement('div');
+    this.playPage.setAttribute('id', 'play-page');
+    this.playPage.classList.add('addable');
+
+    this.playerArea = this.generateArea('player');
+    this.computerArea = this.generateArea('computer');
+
+    this.playPage.appendChild(this.playerArea);
+    this.playPage.appendChild(this.computerArea);
+
+    setTimeout(() => this.main.appendChild(this.playPage), 500);
+    setTimeout(() => this.playPage.classList.add('game-append'), 1000);
+  }
+
+  generateArea(playerType) {
+    const area = document.createElement('div');
+    area.setAttribute('id', `${playerType}-area`);
+    area.appendChild(this.generateScoreboard(playerType));
+    area.appendChild(this.generateGameControls());
+    area.appendChild(this.generateSelectionStatus(playerType));
+
+    return area;
+  }
+
+  generateScoreboard(playerType) {
+    const scoreboard = document.createElement('div');
+    scoreboard.classList.add('scoreboard')
+
+    const title = document.createElement('h3');
+    title.textContent = `${(playerType === 'player') 
+                            ? 'YOUR'
+                            : 'OPPONENT\'S'
+                          } SCORE`;
+
+    scoreboard.appendChild(title);
+
+
+    scoreboard.appendChild(this.generateScore((playerType === 'player')
+                                              ? this.#gameLogic.getPlayerScore()
+                                              : this.#gameLogic.getComputerScore()
+                                             ));
+
+    return scoreboard;
+  } 
+
+  generateScore(points) {
+    const score = document.createElement('div');
+    score.classList.add('score');
+
+    const pointSymbol = String.fromCharCode(0x26AB);
+    const noPointSymbol = String.fromCharCode(0x26AA);
+
+    const filledPoints = pointSymbol.repeat(points);
+    const emptyPoints = noPointSymbol.repeat(5 - points);
+
+    score.textContent = filledPoints + emptyPoints;
+
+    return score;
+  }
+
+  generateGameControls() {
+    const viewportWidth = viewport.width ?? document.documentElement.clientWidth;
+    
+    const controls = document.createElement('div');
+    controls.classList.add('game-controls');
+
+    const rock = document.createElement('img');
+    rock.setAttribute('src', 'https://img.icons8.com/3d-fluency/140/coal.png');
+
+    const paper = document.createElement('img');
+    paper.setAttribute('src', 'https://img.icons8.com/3d-fluency/140/scroll.png');
+    
+    const scissors = document.createElement('img');
+    scissors.setAttribute('src', 'https://img.icons8.com/3d-fluency/140/cut.png');
+    
+
+    [rock, paper, scissors].forEach(icon => {
+      icon.classList.add('game-icon');
+      controls.appendChild(icon);
+    });
+
+    return controls;
+  }
+
+  generateSelectionStatus(playerType, isSelected = false) {
+    const statusMessage = document.createElement('div');
+    statusMessage.classList.add('selection-status');
+    
+    statusMessage.textContent = (isSelected)
+      ? (playerType === 'player') ? 'You made a pick' : 'Opponent made a pick'
+      : (playerType === 'player') ? 'Take your pick' : 'Waiting for the opponent';
+
+    return statusMessage;
+  }
 }
 
-let game = new Game();
 
-const startGameButton = document.querySelector('#start-game');
-const quote = document.querySelector('#quote');
-const header = document.querySelector('header');
 
-startGameButton.addEventListener('mousedown', () => startGameButton.classList.add('clicked'));
-startGameButton.addEventListener('mouseup', () => startGameButton.classList.remove('clicked'));
-startGameButton.addEventListener('click', () => {
-  game = new Game();
-  game.removeFront();
+document.addEventListener('DOMContentLoaded', () => {
+  const gameApp = {
+    gameLogic: null,
+    gameUI: null,
+  }
+
+  gameApp.startGameButton = document.querySelector('#start-game');
+
+  gameApp.startGameButton.addEventListener('mousedown', () => {
+    gameApp.startGameButton.classList.add('clicked');
+  });
+
+  gameApp.startGameButton.addEventListener('mouseup', () => {
+    gameApp.startGameButton.classList.remove('clicked');
+  });
+
+  gameApp.startGameButton.addEventListener('click', () => {
+    gameApp.gameLogic = new GameLogic();
+    gameApp.gameUI = new GameUI(gameApp.gameLogic)
+    gameApp.gameUI.removeFront();
+    gameApp.gameUI.appendRoundInfo();
+    gameApp.gameUI.appendPlayPage();
+  });
 });
+
+
+
+
 
 
 
