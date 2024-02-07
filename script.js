@@ -131,19 +131,20 @@ class GameUI {
   }
 
   generateGameControls() {
-    const viewportWidth = viewport.width ?? document.documentElement.clientWidth;
+    const iconWidth = document.documentElement.clientWidth / 10;
     
+
     const controls = document.createElement('div');
     controls.classList.add('game-controls');
 
     const rock = document.createElement('img');
-    rock.setAttribute('src', 'https://img.icons8.com/3d-fluency/140/coal.png');
+    rock.setAttribute('src', `https://img.icons8.com/3d-fluency/${iconWidth}/coal.png`);
 
     const paper = document.createElement('img');
-    paper.setAttribute('src', 'https://img.icons8.com/3d-fluency/140/scroll.png');
+    paper.setAttribute('src', `https://img.icons8.com/3d-fluency/${iconWidth}/scroll.png`);
     
     const scissors = document.createElement('img');
-    scissors.setAttribute('src', 'https://img.icons8.com/3d-fluency/140/cut.png');
+    scissors.setAttribute('src', `https://img.icons8.com/3d-fluency/${iconWidth}/cut.png`);
     
 
     [rock, paper, scissors].forEach(icon => {
