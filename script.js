@@ -44,7 +44,7 @@ class GameUI {
     this.startGameButton = document.querySelector('#start-game');
     this.quote = document.querySelector('#quote');
     this.header = document.querySelector('header');
-    this.rpsTitle = document.querySelector('#rpsTitle');
+    this.rpsTitle = document.querySelector('#rps-title');
   }
 
   removeFront() {
@@ -61,6 +61,7 @@ class GameUI {
 
   appendRoundInfo() {
     this.roundInfo = document.createElement('h2');
+    this.roundInfo.setAttribute('id', 'round-info');
     this.roundInfo.classList.add('addable');
     this.roundInfo.textContent = `Round ${this.#gameLogic.getRound()}`;
 

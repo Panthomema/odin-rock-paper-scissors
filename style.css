@@ -3,34 +3,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Bungee+Spice&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap');
 
-/* Variables + responsive*/ 
+/* Variables + responsive fonts*/ 
 
 :root {
-  --fs-h1: clamp(2em, 3vw, 4em);
-  --fs-quot: clamp(3em, 4vw, 5em);
-  --fs-btn: clamp(1.5em, 2.5vw, 2em);
-  --fs-footer: clamp(1.5em, 1.5vw, 4em);
+  --fs-h1: clamp(3rem, 3.5vw, 5rem);
+  --fs-quot: clamp(2.5rem, 3vw, 5rem);
+  --fs-btn: clamp(1.25rem, 2vw, 2rem);
+  --fs-footer: clamp(1.25rem, 2vw, 4rem);
+  --fs-h2: clamp(2rem, 2vw, 3rem)
 }
+
 
 @media (max-width: 768px) and (orientation: portrait) {
   :root {
-    --fs-h1: clamp(1.5em, 7vw, 3em);
-    --fs-quot: clamp(2em, 6vw, 3em);
+    --fs-h1: clamp(2.5rem, 3.5vw, 3rem);
+    --fs-quot: clamp(2rem, 6vw, 3rem);
   }
 }
 
 @media (max-width: 768px) and (orientation: landscape) {
   :root {
-    --fs-h1: clamp(1.5em, 3vh, 3em);
-    --fs-quot: clamp(1.5em, 4vh, 3em);
-    --fs-btn: clamp(1.5em, 2.5vh, 2em);
+    --fs-h1: clamp(2rem, 3.5vh, 2.75rem);
+    --fs-quot: clamp(1.5rem, 6vh, 3rem);
+    --fs-btn: clamp(1.25rem, 3vh, 2rem);
   }
 }
 
 @media (max-width: 425px) and (orientation: portrait) {
   :root {
-    --fs-h1: clamp(1.5em, 10vw, 3em);
-    --fs-quot: clamp(1.5em, 6vw, 3em);
+    --fs-h1: clamp(1.5rem, 10vw, 2.5rem);
+    --fs-quot: clamp(1.5rem, 8vw, 3rem);
   }
 }
 
@@ -57,6 +59,10 @@
   min-width: 0;
   margin: 0;
   padding: 0;
+}
+
+html {
+  font-size: 16px;
 }
 
 body {
@@ -123,8 +129,12 @@ header {
   font-size: 24px;
 }
 
-#rpsTitle {
+#rps-title {
   font-size: var(--fs-h1);
+}
+
+#round-info {
+  font-size: var(--fs-h2);
 }
 
 /* Main */
