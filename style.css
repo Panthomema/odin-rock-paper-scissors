@@ -10,22 +10,27 @@
   --fs-quot: clamp(2.5rem, 3vw, 5rem);
   --fs-btn: clamp(1.25rem, 2vw, 2rem);
   --fs-footer: clamp(1.25rem, 2vw, 4rem);
-  --fs-h2: clamp(2rem, 2vw, 3rem)
+  --fs-h2: clamp(2.5rem, 2.5vw, 3.5rem);
+  --fs-h3: clamp(1.125rem, 1.5vw, 2rem);
+  --fs-score: clamp(2.25rem, 5vw, 3rem);
+  --fs-selection-status: clamp(1em, 1.5vw, 1.5em);
 }
 
 
 @media (max-width: 768px) and (orientation: portrait) {
   :root {
-    --fs-h1: clamp(2.5rem, 3.5vw, 3rem);
+    --fs-h1: clamp(2.5rem, 7vw, 3rem);
     --fs-quot: clamp(2rem, 6vw, 3rem);
+    --fs-h2: clamp(2rem, 3vw, 3rem);
   }
 }
 
 @media (max-width: 768px) and (orientation: landscape) {
   :root {
-    --fs-h1: clamp(2rem, 3.5vh, 2.75rem);
+    --fs-h1: clamp(2rem, 10vh, 2.75rem);
     --fs-quot: clamp(1.5rem, 6vh, 3rem);
     --fs-btn: clamp(1.25rem, 3vh, 2rem);
+    --fs-h2: clamp(2rem, 8vh, 2.25rem);
   }
 }
 
@@ -160,11 +165,9 @@ main {
 }
 
 @media (max-height: 500px) {
-
   #quote {
     display: none;
   }
-
 }
 
 /* Play-page */ 
@@ -182,7 +185,7 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 5%;
+  gap: 10%;
   align-items: center;
 }
 
@@ -223,9 +226,13 @@ main {
   align-items: center;
 }
 
+.scoreboard h3 {
+  font-size: var(--fs-h3);
+}
+
 .score {
   width: 100%;
-  font-size: 30px;
+  font-size: var(--fs-score);
   letter-spacing: 5px;
   display: flex;
   justify-content: space-around;
@@ -239,9 +246,44 @@ main {
   gap: 5px;
 }
 
-.game-icon {
-  height: auto;
-  width: auto;
+@media (orientation: portrait) {
+  .game-icon {
+    height: 20vw;
+    width: 20vw;
+  }
+}
+
+@media (orientation: landscape) {
+  .game-icon {
+    height: 10vw;
+    width: 10vw;
+  }
+}
+
+@media (max-width: 768px) and (orientation: portrait) {
+  .game-icon {
+    height: 25vw;
+    width: 25vw;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .game-icon {
+    height: 15vw;
+    width: 15vw;
+  }
+}
+
+/* Selection status */
+
+.selection-status {
+  font-size: var(--fs-selection-status);
+}
+
+@media (max-width: 768px) {
+  .selection-status {
+    display: none;
+  }
 }
 
 

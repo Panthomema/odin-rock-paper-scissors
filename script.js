@@ -138,22 +138,48 @@ class GameUI {
     const controls = document.createElement('div');
     controls.classList.add('game-controls');
 
-    const rock = document.createElement('img');
-    rock.setAttribute('src', `https://img.icons8.com/3d-fluency/${iconWidth}/coal.png`);
+    const rockIcon = this.generateSVGIcon(
+      'https://img.icons8.com/3d-fluency/200/coal.png', 'game-icon'
+    );
 
-    const paper = document.createElement('img');
-    paper.setAttribute('src', `https://img.icons8.com/3d-fluency/${iconWidth}/scroll.png`);
+    const paperIcon = this.generateSVGIcon(
+      'https://img.icons8.com/3d-fluency/200/scroll.png', 'game-icon'
+    );
+
+    const scissorsIcon = this.generateSVGIcon(
+      'https://img.icons8.com/3d-fluency/200/cut.png', 'game-icon'
+    );
+
+  
+    /*
+    const paperIcon = document.createElement('img');
+    paperIcon.setAttribute('src', `https://img.icons8.com/3d-fluency/${iconWidth}/scroll.png`);
     
-    const scissors = document.createElement('img');
-    scissors.setAttribute('src', `https://img.icons8.com/3d-fluency/${iconWidth}/cut.png`);
+    const scissorsIcon = document.createElement('img');
+    scissorsIcon.setAttribute('src', `https://img.icons8.com/3d-fluency/${iconWidth}/cut.png`);
+    */
     
 
-    [rock, paper, scissors].forEach(icon => {
+    [rockIcon, paperIcon, scissorsIcon].forEach(icon => {
       icon.classList.add('game-icon');
       controls.appendChild(icon);
     });
 
     return controls;
+  }
+
+  generateSVGIcon(url, className) {
+    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add(className);
+
+    let image = document.createElementNS("http://www.w3.org/2000/svg", "image");
+    image.setAttribute('href', url);
+    image.style.width = '100%';
+    image.style.height = '100%';
+
+    svg.appendChild(image);
+
+    return svg;
   }
 
   generateSelectionStatus(playerType, isSelected = false) {
