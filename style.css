@@ -12,15 +12,9 @@
   --fs-footer: clamp(1.25rem, 2vw, 4rem);
   --fs-h2: clamp(2.5rem, 2.5vw, 3.5rem);
   --fs-h3: clamp(1.125rem, 1.5vw, 2rem);
-  --fs-score: clamp(2.25rem, 5vw, 3rem);
+  --fs-scoreNode: clamp(1rem, 2vw, 2rem);
   --fs-selection-status: clamp(1em, 1.5vw, 1.5em);
   --bg-gradient: linear-gradient(315deg, #053f5c 0%, #429ebd 55%, #9fe7f5 100%);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-gradient: linear-gradient(315deg, #053f5c 0%, #429ebd 55%, #9fe7f5 100%);
-  }
 }
 
 
@@ -231,6 +225,7 @@ main {
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
+  gap: 1rem;
 }
 
 .scoreboard h3 {
@@ -239,10 +234,10 @@ main {
 
 .score {
   width: 100%;
-  font-size: var(--fs-score);
-  letter-spacing: 5px;
+  font-size: var(--fs-scoreNode);
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 /* Game controls */

@@ -120,21 +120,23 @@ class GameUI {
     const score = document.createElement('div');
     score.classList.add('score');
 
-    const pointSymbol = String.fromCharCode(0x26AB);
-    const noPointSymbol = String.fromCharCode(0x26AA);
+    for (let i = 0; i < points; i++) {
+      const filledScoreNode = document.createElement('i');
+      filledScoreNode.classList.add('fas', 'fa-circle');
+      score.appendChild(filledScoreNode);
+    }
 
-    const filledPoints = pointSymbol.repeat(points);
-    const emptyPoints = noPointSymbol.repeat(5 - points);
-
-    score.textContent = filledPoints + emptyPoints;
+    for (let i = points; i < 5; i++) {
+      const emptyScoreNode = document.createElement('i');
+      emptyScoreNode.classList.add('far', 'fa-circle');
+      score.appendChild(emptyScoreNode);
+    }
 
     return score;
   }
 
   generateGameControls() {
-    const iconWidth = document.documentElement.clientWidth / 10;
-    
-
+  
     const controls = document.createElement('div');
     controls.classList.add('game-controls');
 
@@ -150,18 +152,7 @@ class GameUI {
       'https://img.icons8.com/3d-fluency/200/cut.png', 'game-icon'
     );
 
-  
-    /*
-    const paperIcon = document.createElement('img');
-    paperIcon.setAttribute('src', `https://img.icons8.com/3d-fluency/${iconWidth}/scroll.png`);
-    
-    const scissorsIcon = document.createElement('img');
-    scissorsIcon.setAttribute('src', `https://img.icons8.com/3d-fluency/${iconWidth}/cut.png`);
-    */
-    
-
     [rockIcon, paperIcon, scissorsIcon].forEach(icon => {
-      icon.classList.add('game-icon');
       controls.appendChild(icon);
     });
 
