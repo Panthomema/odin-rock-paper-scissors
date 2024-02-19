@@ -286,7 +286,7 @@ main {
   font-size: var(--fs-selection-status);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) or (max-height: 500px){
   .selection-status {
     display: none;
   }

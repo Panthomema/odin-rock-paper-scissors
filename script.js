@@ -75,11 +75,11 @@ class GameUI {
     this.playPage.setAttribute('id', 'play-page');
     this.playPage.classList.add('addable');
 
-    this.playerArea = this.generateArea('player');
     this.computerArea = this.generateArea('computer');
+    this.playerArea = this.generateArea('player');
 
-    this.playPage.appendChild(this.playerArea);
     this.playPage.appendChild(this.computerArea);
+    this.playPage.appendChild(this.playerArea);
 
     setTimeout(() => this.main.appendChild(this.playPage), 500);
     setTimeout(() => this.playPage.classList.add('game-append'), 1000);
@@ -165,10 +165,7 @@ class GameUI {
     
     let image = document.createElementNS("http://www.w3.org/2000/svg", "image");
     image.setAttribute('href', url);
-    // image.style.width = '100%';
-    // image.style.height = '100%';
-    // image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-
+    
     svg.appendChild(image);
 
     return svg;
