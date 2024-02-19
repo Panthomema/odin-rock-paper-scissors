@@ -162,11 +162,12 @@ class GameUI {
   generateSVGIcon(url, className) {
     let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.classList.add(className);
-
+    
     let image = document.createElementNS("http://www.w3.org/2000/svg", "image");
     image.setAttribute('href', url);
-    image.style.width = '100%';
-    image.style.height = '100%';
+    // image.style.width = '100%';
+    // image.style.height = '100%';
+    // image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
     svg.appendChild(image);
 
