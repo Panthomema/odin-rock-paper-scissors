@@ -1,14 +1,11 @@
-const GAME_OPTIONS = ['Rock', 'Paper', 'Scissors'];
-
-class GameLogic {
-  #round;
-  #playerScore;
-  #computerScore;
+class Game{
+  #round = 1;
+  #playerScore = 0;
+  #computerScore = 0;
 
   constructor() {
-    this.#round = 1;
-    this.#playerScore = 0;
-    this.#computerScore = 0;
+    this.GAME_OPTIONS = ['Rock', 'Paper', 'Scissors'];
+    this.gameUI = new GameUI();
   }
 
   getRound() {
@@ -34,13 +31,23 @@ class GameLogic {
   setComputerScore(value) {
     this.#computerScore = value;
   }
+
+  newGame() {
+    
+    this.gameUI.appendRoundInfo(this.#round);
+    this.gameUI.appendPlayPage();
+
+    this.newRound();
+  }
+
+  newRound() {
+
+  }
 }
 
 class GameUI {
-  #gameLogic;
 
   constructor(gameLogic) {
-    this.#gameLogic = gameLogic;
     this.startGameButton = document.querySelector('#start-game');
     this.quote = document.querySelector('#quote');
     this.header = document.querySelector('header');
@@ -59,11 +66,11 @@ class GameUI {
     }, 500);
   }
 
-  appendRoundInfo() {
+  appendRoundInfo(roundNum) {
     this.roundInfo = document.createElement('h2');
     this.roundInfo.setAttribute('id', 'round-info');
     this.roundInfo.classList.add('addable');
-    this.roundInfo.textContent = `Round ${this.#gameLogic.getRound()}`;
+    this.roundInfo.textContent = `Round ${roundNum}`;
 
     setTimeout(() => this.header.appendChild(this.roundInfo), 500);
     setTimeout(() => this.roundInfo.classList.add('game-append'), 1000);
@@ -89,7 +96,7 @@ class GameUI {
     const area = document.createElement('div');
     area.setAttribute('id', `${playerType}-area`);
     area.appendChild(this.generateScoreboard(playerType));
-    area.appendChild(this.generateGameControls());
+    area.appendChild(this.generateGameControls(playerType));
     area.appendChild(this.generateSelectionStatus(playerType));
 
     return area;
@@ -108,10 +115,7 @@ class GameUI {
     scoreboard.appendChild(title);
 
 
-    scoreboard.appendChild(this.generateScore((playerType === 'player')
-                                              ? this.#gameLogic.getPlayerScore()
-                                              : this.#gameLogic.getComputerScore()
-                                             ));
+    scoreboard.appendChild(this.generateScore(0));
 
     return scoreboard;
   } 
@@ -135,28 +139,49 @@ class GameUI {
     return score;
   }
 
-  generateGameControls() {
-  
+  generateGameControls(playerType) {
     const controls = document.createElement('div');
     controls.classList.add('game-controls');
 
-    const rockIcon = this.generateSVGIcon(
-      'https://img.icons8.com/3d-fluency/200/coal.png', 'game-icon'
-    );
-
-    const paperIcon = this.generateSVGIcon(
-      'https://img.icons8.com/3d-fluency/200/scroll.png', 'game-icon'
-    );
-
-    const scissorsIcon = this.generateSVGIcon(
-      'https://img.icons8.com/3d-fluency/200/cut.png', 'game-icon'
-    );
+    this.loadIcons();
+    const rockIcon = this.rockIcon;
+    const paperIcon = this.paperIcon;
+    const scissorsIcon = this.scissorsIcon;
 
     [rockIcon, paperIcon, scissorsIcon].forEach(icon => {
       controls.appendChild(icon);
+      if (playerType === 'computer') icon.style.opacity = 0;
     });
 
+    
+    if (playerType === 'computer') {
+      const loadingOverlay = this.generateOpponentOverlay();
+      controls.appendChild(loadingOverlay);
+    }
+    
+
     return controls;
+  }
+
+  generateOpponentOverlay() {
+    const loadingOverlay = document.createElement('div');
+    loadingOverlay.setAttribute('id', 'loading-overlay');
+
+    return loadingOverlay;
+  }
+
+  loadIcons() {
+    this.rockIcon = this.generateSVGIcon(
+      'https://img.icons8.com/3d-fluency/200/coal.png', 'game-icon'
+    );
+
+    this.paperIcon = this.generateSVGIcon(
+      'https://img.icons8.com/3d-fluency/200/scroll.png', 'game-icon'
+    );
+
+    this.scissorsIcon = this.generateSVGIcon(
+      'https://img.icons8.com/3d-fluency/200/cut.png', 'game-icon'
+    );
   }
 
   generateSVGIcon(url, className) {
@@ -185,28 +210,23 @@ class GameUI {
 
 
 
+
 document.addEventListener('DOMContentLoaded', () => {
-  const gameApp = {
-    gameLogic: null,
-    gameUI: null,
-  }
+  
+  const startGameButton = document.querySelector('#start-game');
 
-  gameApp.startGameButton = document.querySelector('#start-game');
-
-  gameApp.startGameButton.addEventListener('mousedown', () => {
-    gameApp.startGameButton.classList.add('clicked');
+  startGameButton.addEventListener('mousedown', () => {
+    startGameButton.classList.add('clicked');
   });
 
-  gameApp.startGameButton.addEventListener('mouseup', () => {
-    gameApp.startGameButton.classList.remove('clicked');
+  startGameButton.addEventListener('mouseup', () => {
+    startGameButton.classList.remove('clicked');
   });
 
-  gameApp.startGameButton.addEventListener('click', () => {
-    gameApp.gameLogic = new GameLogic();
-    gameApp.gameUI = new GameUI(gameApp.gameLogic)
-    gameApp.gameUI.removeFront();
-    gameApp.gameUI.appendRoundInfo();
-    gameApp.gameUI.appendPlayPage();
+  startGameButton.addEventListener('click', () => {
+    const game = new Game();
+    game.gameUI.removeFront();
+    game.newGame(); 
   });
 });
 

@@ -280,6 +280,18 @@ main {
   }
 }
 
+#player-area .game-icon {
+  cursor: pointer;
+}
+
+/* Loading Overlay */
+
+#loading-overlay {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
 /* Selection status */
 
 .selection-status {
@@ -290,11 +302,6 @@ main {
   .selection-status {
     display: none;
   }
-}
-
-
-#player-area .game-icon {
-  cursor: pointer;
 }
 
 /* Footer */
