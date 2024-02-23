@@ -167,6 +167,20 @@ class GameUI {
     const loadingOverlay = document.createElement('div');
     loadingOverlay.setAttribute('id', 'loading-overlay');
 
+    const lottiePlayer = document.createElement('lottie-player');
+    const properties = {
+      'src': 'https://lottie.host/8588aecb-1b4b-48e1-a569-e63734975c1e/gA4wf2wLSp.json',
+      'autoplay': '',
+      'loop': '',
+      'mode': 'normal',
+    };
+
+    Object.entries(properties).forEach(([attribute, value]) => {
+      lottiePlayer.setAttribute(attribute, value);
+    });
+
+    loadingOverlay.appendChild(lottiePlayer);
+
     return loadingOverlay;
   }
 
