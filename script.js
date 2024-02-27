@@ -4,7 +4,7 @@ class Game{
   #computerScore = 0;
 
   constructor() {
-    this.GAME_OPTIONS = ['Rock', 'Paper', 'Scissors'];
+    this.GAME_OPTIONS = ['rock', 'paper', 'scissors'];
     this.gameUI = new GameUI();
   }
 
@@ -33,143 +33,66 @@ class Game{
   }
 
   newGame() {
-    
-    this.gameUI.appendRoundInfo(this.#round);
-    this.gameUI.appendPlayPage();
+    this.gameUI.renderGame();
+
+    /*
+    while (this.#computerScore < 5 && this.#playerScore < 5) {
+      
+      Here we need an async function that waits for the user to select,
+      and for the computer to select (i will set a timeout to CPU selection)
+      this.resolveRound();
+    }
+    */
 
     this.newRound();
+    
+    //this.finishGame();
   }
 
   newRound() {
+    this.gameUI.renderNewRound(this.#round);
+  }
 
+  resolveRound() {
+    // Should make the calculations, updates of game class props, and call the result rendering
   }
 }
 
 class GameUI {
 
-  constructor(gameLogic) {
-    this.startGameButton = document.querySelector('#start-game');
-    this.quote = document.querySelector('#quote');
+  constructor() {
     this.header = document.querySelector('header');
-    this.rpsTitle = document.querySelector('#rps-title');
-  }
-
-  removeFront() {
-    this.startGameButton.classList.add('front-remove');
-    this.quote.classList.add('front-remove');
-    this.rpsTitle.classList.add('front-remove');
-
-    setTimeout(() => {
-      this.startGameButton.remove();
-      this.quote.remove();
-      this.rpsTitle.remove();
-    }, 500);
-  }
-
-  appendRoundInfo(roundNum) {
-    this.roundInfo = document.createElement('h2');
-    this.roundInfo.setAttribute('id', 'round-info');
-    this.roundInfo.classList.add('addable');
-    this.roundInfo.textContent = `Round ${roundNum}`;
-
-    setTimeout(() => this.header.appendChild(this.roundInfo), 500);
-    setTimeout(() => this.roundInfo.classList.add('game-append'), 1000);
-  }
-
-  appendPlayPage() {
     this.main = document.querySelector('main');
-    this.playPage = document.createElement('div');
-    this.playPage.setAttribute('id', 'play-page');
-    this.playPage.classList.add('addable');
-
-    this.computerArea = this.generateArea('computer');
-    this.playerArea = this.generateArea('player');
-
-    this.playPage.appendChild(this.computerArea);
-    this.playPage.appendChild(this.playerArea);
-
-    setTimeout(() => this.main.appendChild(this.playPage), 500);
-    setTimeout(() => this.playPage.classList.add('game-append'), 1000);
+    this.footer = document.querySelector('footer');
   }
 
-  generateArea(playerType) {
-    const area = document.createElement('div');
-    area.setAttribute('id', `${playerType}-area`);
-    area.appendChild(this.generateScoreboard(playerType));
-    area.appendChild(this.generateGameControls(playerType));
-    area.appendChild(this.generateSelectionStatus(playerType));
+  // General purpose functions
 
-    return area;
+  addClass(elements, className) {
+    elements.forEach(element => element.classList.add(className));
   }
 
-  generateScoreboard(playerType) {
-    const scoreboard = document.createElement('div');
-    scoreboard.classList.add('scoreboard')
-
-    const title = document.createElement('h3');
-    title.textContent = `${(playerType === 'player') 
-                            ? 'YOUR'
-                            : 'OPPONENT\'S'
-                          } SCORE`;
-
-    scoreboard.appendChild(title);
-
-
-    scoreboard.appendChild(this.generateScore(0));
-
-    return scoreboard;
-  } 
-
-  generateScore(points) {
-    const score = document.createElement('div');
-    score.classList.add('score');
-
-    for (let i = 0; i < points; i++) {
-      const filledScoreNode = document.createElement('i');
-      filledScoreNode.classList.add('fas', 'fa-circle');
-      score.appendChild(filledScoreNode);
-    }
-
-    for (let i = points; i < 5; i++) {
-      const emptyScoreNode = document.createElement('i');
-      emptyScoreNode.classList.add('far', 'fa-circle');
-      score.appendChild(emptyScoreNode);
-    }
-
-    return score;
+  removeElements(elements) {
+    elements.forEach(element => element.remove());
   }
 
-  generateGameControls(playerType) {
-    const controls = document.createElement('div');
-    controls.classList.add('game-controls');
+  createElement(tag, id, ...classNames) {
+    const element = document.createElement(tag);
+    if (id) element.setAttribute('id', id);
+    classNames.forEach(name => element.classList.add(name));
 
-    this.loadIcons();
-    const rockIcon = this.rockIcon;
-    const paperIcon = this.paperIcon;
-    const scissorsIcon = this.scissorsIcon;
-
-    [rockIcon, paperIcon, scissorsIcon].forEach(icon => {
-      controls.appendChild(icon);
-      if (playerType === 'computer') icon.style.opacity = 0;
-    });
-
-    
-    if (playerType === 'computer') {
-      const loadingOverlay = this.generateOpponentOverlay();
-      controls.appendChild(loadingOverlay);
-    }
-    
-
-    return controls;
+    return element;
   }
 
-  generateOpponentOverlay() {
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.setAttribute('id', 'loading-overlay');
+  appendWithDelay(element, parent) {
+    setTimeout(() => parent.appendChild(element), 500);
+    setTimeout(() => element.classList.add('game-append'), 1000);
+  }
 
+  createLottieAnimation(url) {
     const lottiePlayer = document.createElement('lottie-player');
     const properties = {
-      'src': 'https://lottie.host/8588aecb-1b4b-48e1-a569-e63734975c1e/gA4wf2wLSp.json',
+      'src': url,
       'autoplay': '',
       'loop': '',
       'mode': 'normal',
@@ -179,30 +102,14 @@ class GameUI {
       lottiePlayer.setAttribute(attribute, value);
     });
 
-    loadingOverlay.appendChild(lottiePlayer);
-
-    return loadingOverlay;
+    return lottiePlayer;
   }
 
-  loadIcons() {
-    this.rockIcon = this.generateSVGIcon(
-      'https://img.icons8.com/3d-fluency/200/coal.png', 'game-icon'
-    );
-
-    this.paperIcon = this.generateSVGIcon(
-      'https://img.icons8.com/3d-fluency/200/scroll.png', 'game-icon'
-    );
-
-    this.scissorsIcon = this.generateSVGIcon(
-      'https://img.icons8.com/3d-fluency/200/cut.png', 'game-icon'
-    );
-  }
-
-  generateSVGIcon(url, className) {
-    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.classList.add(className);
+  createSVGIcon(url, ...classNames) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    classNames.forEach(name => svg.classList.add(name));
     
-    let image = document.createElementNS("http://www.w3.org/2000/svg", "image");
+    const image = document.createElementNS("http://www.w3.org/2000/svg", "image");
     image.setAttribute('href', url);
     
     svg.appendChild(image);
@@ -210,25 +117,217 @@ class GameUI {
     return svg;
   }
 
-  generateSelectionStatus(playerType, isSelected = false) {
+  createFAsIcon(prefix, iconName) {
+    const checkedIcon = document.createElement('i');
+    checkedIcon.classList.add(prefix, iconName);
+    
+    return checkedIcon;
+  }
+
+  // Loading key resources
+
+  loadResources() {
+    const iconURLs = new Map();
+    iconURLs.set('rock', 'https://img.icons8.com/3d-fluency/200/coal.png');
+    iconURLs.set('paper', 'https://img.icons8.com/3d-fluency/200/scroll.png');
+    iconURLs.set('scissors', 'https://img.icons8.com/3d-fluency/200/cut.png');
+
+    const createIconMap = ([name, url]) => {
+      return [name, this.createSVGIcon(url, 'game-icon')];
+    }
+
+    this.computerIcons = new Map(Array.from(iconURLs, createIconMap));
+    this.playerIcons = new Map(Array.from(iconURLs, createIconMap));
+
+    this.loadingWheel = this.createLottieAnimation(
+      'https://lottie.host/8588aecb-1b4b-48e1-a569-e63734975c1e/gA4wf2wLSp.json'
+    );
+    this.checkedIcon = this.createFAsIcon('fas', 'fa-check');
+  }
+
+  // UI renderization
+
+  removeFront() {
+    const startGameButton = document.querySelector('#start-game');
+    const quote = document.querySelector('#quote');
+    const rpsTitle = document.querySelector('#rps-title');
+    
+    this.addClass([startGameButton, quote, rpsTitle], 'front-remove');
+    setTimeout(() => {
+      this.removeElements([startGameButton, quote, rpsTitle])
+    }, 500);
+  }
+
+  renderGame() {
+    this.loadResources();
+    this.renderHeader();
+    this.renderMain();
+  }
+
+  renderHeader() {
+    this.roundInfo = this.createElement('h2', 'round-info', 'addable');
+    this.appendWithDelay(this.roundInfo, this.header);
+  }
+
+  renderMain() {
+    this.main = document.querySelector('main');
+    const playPage = this.createElement('div', 'play-page', 'addable');
+
+    const computerArea = this.createArea('computer');
+    const playerArea = this.createArea('player');
+
+    playPage.appendChild(computerArea);
+    playPage.appendChild(playerArea);
+
+    this.appendWithDelay(playPage, this.main);
+  }
+
+  // UI Elements creation
+
+  createArea(player) {
+    const area = document.createElement('div');
+    area.setAttribute('id', `${player}-area`);
+    area.appendChild(this.createScoreboard(player));
+    area.appendChild(this.generateGameControls(player));
+    area.appendChild(this.createSelectionStatus(player));
+
+    return area;
+  }
+
+  createScoreboard(player) {
+    const scoreboard = this.createElement('div', undefined, 'scoreboard');
+
+    const title = this.createElement('h3');
+    let scoreTable;
+
+    if (player === 'player') {
+      title.textContent = 'PLAYER SCORE';
+      this.playerScore = this.createScoreNodes();
+      scoreTable = this.playerScore;
+    } else {
+      title.textContent = 'OPPONENT\'S SCORE';
+      this.computerScore = this.createScoreNodes();
+      scoreTable = this.computerScore;
+    }
+
+    scoreboard.appendChild(title);
+    scoreboard.appendChild(scoreTable);
+
+    return scoreboard;
+  }
+  
+  createScoreNodes() {
+    const score = this.createElement('div', undefined, 'score-nodes');
+
+    for (let i = 0; i < 5; i++) {
+      const filledScoreNode = this.createFAsIcon('far', 'fa-circle');
+      score.appendChild(filledScoreNode);
+    }
+
+    return score;
+  }
+
+  // UI elements modification
+
+  updateRoundInfo(roundNum) {
+    this.roundInfo.textContent = `Round ${roundNum}`;
+  }
+
+  updateScoreNodes(player) {
+    const scoreNodes = (player === 'player') 
+                          ? this.playerScore 
+                          : this.computerScore;
+    
+    const nextPoint = scoreNodes.querySelector('.fa-circle');
+
+    if (nextPoint) {
+      nextPoint.classList.replace('fa-circle', 'fa-check-circle');
+    }
+  }
+
+
+
+
+
+
+  
+  
+
+  showRoundResult(winner) {
+    // Will hide wheel show both selections, update the round winner score, and a YOU WIN/LOSE msg
+  }
+
+  renderNewRound(roundNum) {
+    this.updateRoundInfo(roundNum);
+    this.updateOpponentOverlay();
+    this.loadingOverlay.style.opacity = 1;
+  }
+
+  
+
+  generateGameControls(player) {
+    const controls = this.createElement('div', undefined, 'game-controls');
+    
+    const icons = Array.from((player === 'player')
+                                ? this.playerIcons.values()
+                                : this.computerIcons.values()
+                            );
+    
+
+    icons.forEach(icon => {
+      controls.appendChild(icon);
+      if (player === 'computer') icon.style.opacity = 0;
+    });
+
+    
+    if (player === 'computer') {
+      this.loadingOverlay = this.generateOpponentOverlay();
+      controls.appendChild(this.loadingOverlay);
+    }
+
+    return controls;
+  }
+
+  generateOpponentOverlay() {
+    const loadingOverlay = document.createElement('div');
+    loadingOverlay.setAttribute('id', 'loading-overlay');
+
+    return loadingOverlay;
+  }
+
+  updateOpponentOverlay(isSelected = false) {
+    this.loadingOverlay.appendChild(
+      (isSelected) ? this.checkedIcon : this.loadingWheel
+    );
+  }
+
+  
+
+  // Fusionar updateOpponentOverlay con updateSelectionStatus¿?
+
+  createSelectionStatus(player) {
+
+  }
+  
+
+  generateSelectionStatus(player, isSelected = false) {
     const statusMessage = document.createElement('div');
     statusMessage.classList.add('selection-status');
     
     statusMessage.textContent = (isSelected)
-      ? (playerType === 'player') ? 'You made a pick' : 'Opponent made a pick'
-      : (playerType === 'player') ? 'Take your pick' : 'Waiting for the opponent';
+      ? (player === 'player') ? 'You made a pick' : 'Opponent made a pick'
+      : (player === 'player') ? 'Take your pick' : 'Waiting for the opponent';
 
     return statusMessage;
   }
 }
 
-
+const game = new Game();
 
 
 document.addEventListener('DOMContentLoaded', () => {
   
   const startGameButton = document.querySelector('#start-game');
-
   startGameButton.addEventListener('mousedown', () => {
     startGameButton.classList.add('clicked');
   });
@@ -238,7 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   startGameButton.addEventListener('click', () => {
-    const game = new Game();
     game.gameUI.removeFront();
     game.newGame(); 
   });
@@ -426,12 +524,4 @@ function resolveRound(result, playerSelection, computerSelection) {
 
   score.textContent = `${playerScore} - ${computerScore}`;
 }
-
-/*
-function newGame() {
-
-  playerScore = 0;
-  computerScore = 0;
-}
-*/
 
