@@ -2,6 +2,8 @@ class Game{
   #round = 1;
   #playerScore = 0;
   #computerScore = 0;
+  #playerSelection = null;
+  #computerSelection = null;
 
   constructor() {
     this.GAME_OPTIONS = ['rock', 'paper', 'scissors'];
@@ -45,16 +47,49 @@ class Game{
     */
 
     this.newRound();
-    
-    //this.finishGame();
+
+    this.resolveRound();
+
+    // this.finishGame();
   }
 
   newRound() {
     this.gameUI.renderNewRound(this.#round);
   }
 
-  resolveRound() {
-    // Should make the calculations, updates of game class props, and call the result rendering
+  delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  } 
+
+  async getComputerSelection() {
+    const randomDelay = Math.floor(Math.random() * 30000) + 1000;
+    await this.delay(randomDelay);
+
+    return this.generateComputerChoice();
+  }
+
+  generateComputerChoice() {
+    this.gameUI.showComputerHasSelected('computer');
+    return this.GAME_OPTIONS[Math.floor(Math.random() * 3)];
+  }
+
+  async playRound() {
+    return Promise.all([
+      this.getComputerSelection(),
+      this.gameUI.getPlayerSelection(),
+    ])
+  }
+
+  async resolveRound() {
+    [this.#computerSelection, this.#playerSelection] = await this.playRound();
+
+    
+  }
+
+  
+
+  finishGame() {
+    // Should show a modal, with the result and a button to restart the game
   }
 }
 
@@ -188,7 +223,7 @@ class GameUI {
     const area = document.createElement('div');
     area.setAttribute('id', `${player}-area`);
     area.appendChild(this.createScoreboard(player));
-    area.appendChild(this.generateGameControls(player));
+    area.appendChild(this.createGameControls(player));
     area.appendChild(this.createSelectionStatus(player));
 
     return area;
@@ -198,20 +233,20 @@ class GameUI {
     const scoreboard = this.createElement('div', undefined, 'scoreboard');
 
     const title = this.createElement('h3');
-    let scoreTable;
+    let scoreNodes;
 
     if (player === 'player') {
       title.textContent = 'PLAYER SCORE';
       this.playerScore = this.createScoreNodes();
-      scoreTable = this.playerScore;
+      scoreNodes = this.playerScore;
     } else {
       title.textContent = 'OPPONENT\'S SCORE';
       this.computerScore = this.createScoreNodes();
-      scoreTable = this.computerScore;
+      scoreNodes = this.computerScore;
     }
 
     scoreboard.appendChild(title);
-    scoreboard.appendChild(scoreTable);
+    scoreboard.appendChild(scoreNodes);
 
     return scoreboard;
   }
@@ -227,6 +262,47 @@ class GameUI {
     return score;
   }
 
+  createGameControls(player) {
+    const controls = this.createElement('div', undefined, 'game-controls');
+    let icons, iconNames;
+
+    if (player === 'player') {
+      icons = Array.from(this.playerIcons.values());
+    } else {
+      icons = Array.from(this.computerIcons.values());
+      iconNames = Array.from(this.computerIcons.keys());
+
+      this.updateGameIconsOpacity('computer', 0, ...iconNames);
+      this.loadingOverlay = this.createOpponentOverlay();
+      controls.appendChild(this.loadingOverlay);
+    }
+
+    icons.forEach(icon => {
+      controls.appendChild(icon);
+    });
+
+    return controls;
+  }
+
+  createOpponentOverlay() {
+    const loadingOverlay = document.createElement('div');
+    loadingOverlay.setAttribute('id', 'loading-overlay');
+
+    return loadingOverlay;
+  }
+
+  createSelectionStatus(player) {
+    const statusMessage = this.createElement('div', undefined, 'selection-status');
+    if (player === 'player') {
+      this.playerStatusMessage = statusMessage;
+    } else {
+      this.computerStatusMessage = statusMessage;
+    }
+    
+    return statusMessage;
+  }
+
+
   // UI elements modification
 
   updateRoundInfo(roundNum) {
@@ -236,8 +312,8 @@ class GameUI {
   updateScoreNodes(player) {
     const scoreNodes = (player === 'player') 
                           ? this.playerScore 
-                          : this.computerScore;
-    
+                          : this.computerScore; 
+
     const nextPoint = scoreNodes.querySelector('.fa-circle');
 
     if (nextPoint) {
@@ -245,81 +321,81 @@ class GameUI {
     }
   }
 
-
-
-
-
-
-  
-  
-
-  showRoundResult(winner) {
-    // Will hide wheel show both selections, update the round winner score, and a YOU WIN/LOSE msg
-  }
-
-  renderNewRound(roundNum) {
-    this.updateRoundInfo(roundNum);
-    this.updateOpponentOverlay();
-    this.loadingOverlay.style.opacity = 1;
-  }
-
-  
-
-  generateGameControls(player) {
-    const controls = this.createElement('div', undefined, 'game-controls');
-    
-    const icons = Array.from((player === 'player')
-                                ? this.playerIcons.values()
-                                : this.computerIcons.values()
-                            );
-    
-
-    icons.forEach(icon => {
-      controls.appendChild(icon);
-      if (player === 'computer') icon.style.opacity = 0;
-    });
-
-    
-    if (player === 'computer') {
-      this.loadingOverlay = this.generateOpponentOverlay();
-      controls.appendChild(this.loadingOverlay);
-    }
-
-    return controls;
-  }
-
-  generateOpponentOverlay() {
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.setAttribute('id', 'loading-overlay');
-
-    return loadingOverlay;
+  updateGameIconsOpacity(player, opacity, ...iconNames) {
+    const icons = (player === 'player') ? this.playerIcons : this.computerIcons;
+    iconNames.forEach(name => icons.get(name).style.opacity = opacity); 
   }
 
   updateOpponentOverlay(isSelected = false) {
+    if (this.loadingOverlay.firstChild) {
+      this.loadingOverlay.removeChild(this.loadingOverlay.firstChild);
+    }
+
     this.loadingOverlay.appendChild(
       (isSelected) ? this.checkedIcon : this.loadingWheel
     );
   }
 
-  
-
-  // Fusionar updateOpponentOverlay con updateSelectionStatus¿?
-
-  createSelectionStatus(player) {
-
+  updateSelectionStatus(player, isSelected = false) {
+    if (player === 'player') {
+      this.playerStatusMessage.textContent = (isSelected)
+                                              ? 'You made a pick'
+                                              : 'Take your pick'; 
+    } else {
+      this.computerStatusMessage.textContent = (isSelected)
+                                                ? 'Opponent made a pick'
+                                                : 'Waiting for opponent';
+    }
   }
-  
 
-  generateSelectionStatus(player, isSelected = false) {
-    const statusMessage = document.createElement('div');
-    statusMessage.classList.add('selection-status');
-    
-    statusMessage.textContent = (isSelected)
-      ? (player === 'player') ? 'You made a pick' : 'Opponent made a pick'
-      : (player === 'player') ? 'Take your pick' : 'Waiting for the opponent';
 
-    return statusMessage;
+  // Game flux control
+
+  renderNewRound(roundNum) {
+    this.updateRoundInfo(roundNum);
+    this.updateOpponentOverlay();
+    this.loadingOverlay.style.opacity = 1;
+    this.updateSelectionStatus('player');
+    this.updateSelectionStatus('computer');
   }
+
+  showComputerHasSelected() { 
+    this.updateOpponentOverlay(true);
+    this.updateSelectionStatus('computer', true);
+  }
+
+  attachPlayerSelectionEvents() {
+    return new Promise(resolve => {
+      const icons = Array.from(this.playerIcons.entries());
+
+      const clickHandler = name => {
+        this.showPlayerHasSelected(name);
+        resolve(name);
+      }
+
+      icons.forEach(([name, icon]) => {
+        icon.addEventListener('click', () => clickHandler(name));
+      }) 
+    });
+  }
+
+  async getPlayerSelection() {
+    return await this.attachPlayerSelectionEvents();
+  }
+
+  showPlayerHasSelected(selection) {
+    this.updateSelectionStatus('player', true);
+    this.updateGameIconsOpacity(
+      'player', 
+      0, 
+      ...this.playerIcons.keys().filter(icon => icon !== selection)
+    );
+  }
+
+  showRoundResult(winner) {
+    // Will hide wheel, show both selections, update the round winner score, and a YOU WIN/LOSE msg
+  }
+
 }
 
 const game = new Game();
