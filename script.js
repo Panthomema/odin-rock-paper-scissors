@@ -12,11 +12,12 @@ class Game{
 
   async newGame() {
     this.gameUI.renderGame();
+    let roundWinner;
 
     while (this.#computerScore < 5 && this.#playerScore < 5) {
       this.newRound();
-      await this.resolveRound();
-      this.updateValues();
+      roundWinner = await this.resolveRound();
+      this.updateValues(roundWinner);
     }
   
     // this.finishGame();
@@ -55,6 +56,8 @@ class Game{
     const roundWinner = this.determineWinner();
     this.gameUI.showRoundResult(this.#computerSelection, roundWinner);
     await this.delay(4000);
+    
+    return roundWinner;
   }
 
   determineWinner() {
@@ -65,13 +68,17 @@ class Game{
     };
 
     const result = outcomes[this.#playerSelection][this.#computerSelection];
+
     return result || null;
   }
 
-  updateValues() {
+  updateValues(roundWinner) {
     this.#round++;
     this.#playerSelection = null;
     this.#computerSelection = null;
+
+    if (roundWinner === 'player') this.#playerScore++;
+    if (roundWinner === 'computer') this.#computerScore++;
   }
 
   finishGame() {
@@ -268,9 +275,7 @@ class GameUI {
   }
 
   createOpponentOverlay() {
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.setAttribute('id', 'loading-overlay');
-
+    const loadingOverlay = this.createElement('div', 'loading-overlay');
     return loadingOverlay;
   }
 
@@ -297,10 +302,10 @@ class GameUI {
                           ? this.playerScore 
                           : this.computerScore; 
 
-    const nextPoint = scoreNodes.querySelector('.fa-circle');
+    const nextPoint = scoreNodes.querySelector('.far');
 
     if (nextPoint) {
-      nextPoint.classList.replace('fa-circle', 'fa-check-circle');
+      nextPoint.classList.replace('far', 'fas');
     }
   }
 
@@ -314,9 +319,15 @@ class GameUI {
       this.loadingOverlay.removeChild(this.loadingOverlay.firstChild);
     }
 
-    this.loadingOverlay.appendChild(
-      (isSelected) ? this.checkedIcon : this.loadingWheel
-    );
+    if (isSelected) {
+      this.loadingOverlay.appendChild(this.checkedIcon);
+    } else {
+      this.loadingWheel = this.createLottieAnimation(
+        'https://lottie.host/8588aecb-1b4b-48e1-a569-e63734975c1e/gA4wf2wLSp.json'
+      );
+
+      this.loadingOverlay.appendChild(this.loadingWheel);
+    }
   }
 
   updateSelectionStatus(player, isSelected = false) {

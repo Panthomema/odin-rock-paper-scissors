@@ -1,0 +1,19 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(315deg, #053f5c 0%, #429ebd 55%, #9fe7f5 100%);
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+}
+
+#overlay {
+  width: 20vw;
+  height: 10vh;
+  color: #f8f8f8;
+  font-size: 10vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
