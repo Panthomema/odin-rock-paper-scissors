@@ -10,46 +10,15 @@ class Game{
     this.gameUI = new GameUI();
   }
 
-  getRound() {
-    return this.#round;
-  }
-
-  setRound(value) {
-    this.#round = value;
-  }
-
-  getPlayerScore() {
-    return this.#playerScore;
-  }
-
-  setPlayerScore(value) {
-    this.#playerScore = value;
-  }
-
-  getComputerScore() {
-    return this.#computerScore;
-  }
-
-  setComputerScore(value) {
-    this.#computerScore = value;
-  }
-
-  newGame() {
+  async newGame() {
     this.gameUI.renderGame();
 
-    /*
     while (this.#computerScore < 5 && this.#playerScore < 5) {
-      
-      Here we need an async function that waits for the user to select,
-      and for the computer to select (i will set a timeout to CPU selection)
-      this.resolveRound();
+      this.newRound();
+      await this.resolveRound();
+      this.updateValues();
     }
-    */
-
-    this.newRound();
-
-    this.resolveRound();
-
+  
     // this.finishGame();
   }
 
@@ -62,7 +31,7 @@ class Game{
   } 
 
   async getComputerSelection() {
-    const randomDelay = Math.floor(Math.random() * 30000) + 1000;
+    const randomDelay = Math.floor(Math.random() * 15000) + 1000;
     await this.delay(randomDelay);
 
     return this.generateComputerChoice();
@@ -83,10 +52,27 @@ class Game{
   async resolveRound() {
     [this.#computerSelection, this.#playerSelection] = await this.playRound();
 
-    
+    const roundWinner = this.determineWinner();
+    this.gameUI.showRoundResult(this.#computerSelection, roundWinner);
+    await this.delay(4000);
   }
 
-  
+  determineWinner() {
+    const outcomes = {
+      rock: { scissors: 'player', paper: 'computer' },
+      paper: { rock: 'player', scissors: 'computer' },
+      scissors: { paper: 'player', rock: 'computer' }
+    };
+
+    const result = outcomes[this.#playerSelection][this.#computerSelection];
+    return result || null;
+  }
+
+  updateValues() {
+    this.#round++;
+    this.#playerSelection = null;
+    this.#computerSelection = null;
+  }
 
   finishGame() {
     // Should show a modal, with the result and a button to restart the game
@@ -264,15 +250,12 @@ class GameUI {
 
   createGameControls(player) {
     const controls = this.createElement('div', undefined, 'game-controls');
-    let icons, iconNames;
+    let icons;
 
     if (player === 'player') {
       icons = Array.from(this.playerIcons.values());
     } else {
       icons = Array.from(this.computerIcons.values());
-      iconNames = Array.from(this.computerIcons.keys());
-
-      this.updateGameIconsOpacity('computer', 0, ...iconNames);
       this.loadingOverlay = this.createOpponentOverlay();
       controls.appendChild(this.loadingOverlay);
     }
@@ -323,7 +306,7 @@ class GameUI {
 
   updateGameIconsOpacity(player, opacity, ...iconNames) {
     const icons = (player === 'player') ? this.playerIcons : this.computerIcons;
-    iconNames.forEach(name => icons.get(name).style.opacity = opacity); 
+    iconNames.forEach(name => icons.get(name).style.setProperty('opacity', opacity)); 
   }
 
   updateOpponentOverlay(isSelected = false) {
@@ -353,8 +336,9 @@ class GameUI {
 
   renderNewRound(roundNum) {
     this.updateRoundInfo(roundNum);
+    this.restoreGameIcons();
     this.updateOpponentOverlay();
-    this.loadingOverlay.style.opacity = 1;
+    this.loadingOverlay.style.setProperty('opacity', 1);
     this.updateSelectionStatus('player');
     this.updateSelectionStatus('computer');
   }
@@ -371,6 +355,11 @@ class GameUI {
       const clickHandler = name => {
         this.showPlayerHasSelected(name);
         resolve(name);
+
+        // Remove event listeners after the user makes a selection
+        icons.forEach(([name, icon]) => {
+          icon.removeEventListener('click', clickHandler);
+        });
       }
 
       icons.forEach(([name, icon]) => {
@@ -392,8 +381,26 @@ class GameUI {
     );
   }
 
-  showRoundResult(winner) {
-    // Will hide wheel, show both selections, update the round winner score, and a YOU WIN/LOSE msg
+  showRoundResult(computerSelection, winner) {
+    this.loadingOverlay.style.setProperty('opacity', 0);
+    this.updateGameIconsOpacity('computer', 1, computerSelection);
+
+    if (winner) {
+      this.updateScoreNodes(winner);
+    }
+  }
+
+  restoreGameIcons() {
+    this.updateGameIconsOpacity(
+      'computer', 
+      0, 
+      ...Array.from(this.computerIcons.keys())
+    );
+    this.updateGameIconsOpacity(
+      'player', 
+      1, 
+      ...Array.from(this.playerIcons.keys())
+    );
   }
 
 }
@@ -418,186 +425,4 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-
-
-
-
-
-
-
-let style = document.createElement('style');
-let gameControlClass =
-  `.game-control { border: none; background-color: #fff; font-size: 20px; color: ${gameColor}; padding: 10px; border-radius: 2px; cursor: pointer }`;
-
-let gameControlHover = '.game-control:hover { transform: scale(0.9) }';
-
-style.appendChild(document.createTextNode(gameControlClass));
-style.appendChild(document.createTextNode(gameControlHover));
-document.head.appendChild(style);
-
-const wrapper = document.createElement('div');
-wrapper.setAttribute('id', 'wrapper');
-wrapper.style.width = '100%';
-wrapper.style.height = '90vh';
-wrapper.style.display = 'flex';
-wrapper.style.justifyContent = 'center';
-wrapper.style.alignItems = 'center';
-wrapper.style.flexDirection = 'column';
-
-const title = document.createElement('h1');
-title.textContent = 'LET\'S PLAY!';
-title.style.color = gameColor;
-title.style.cursor = 'pointer';
-
-const gameControls = document.createElement('div');
-gameControls.setAttribute('id', 'game-controls');
-gameControls.style.display = 'flex';
-gameControls.style.gap = '10px';
-gameControls.style.justifyContent = 'space-around';
-gameControls.style.background = gameColor;
-gameControls.style.padding = '25px';
-gameControls.style.borderRadius = '5px';
-
-const rockButton = document.createElement('button');
-rockButton.textContent = 'ROCK';
-rockButton.value = 'Rock';
-rockButton.classList.add('game-control');
-
-const paperButton = document.createElement('button');
-paperButton.textContent = 'PAPER';
-paperButton.value = 'Paper';
-paperButton.classList.add('game-control');
-
-const scissorsButton = document.createElement('button');
-scissorsButton.textContent = 'SCISSORS';
-scissorsButton.value = 'Scissors';
-scissorsButton.classList.add('game-control');
-
-gameControls.appendChild(rockButton);
-gameControls.appendChild(paperButton);
-gameControls.appendChild(scissorsButton);
-
-const resultsTextbox = document.createElement('div');
-resultsTextbox.setAttribute('id', 'results-textbox');
-resultsTextbox.style.textAlign = 'center';
-resultsTextbox.style.color = gameColor;
-resultsTextbox.style.display = 'flex';
-resultsTextbox.style.flexDirection = 'column';
-resultsTextbox.style.padding = '25px';
-resultsTextbox.style.maxWidth = '350px';
-
-const score = document.createElement('h1');
-score.textContent = `${playerScore} - ${computerScore}`;
-resultsTextbox.appendChild(score);
-
-const roundMessage = document.createElement('div');
-roundMessage.setAttribute('id', 'round-message');
-roundMessage.style.width = '100%';
-
-const roundResult = document.createElement('h3');
-roundMessage.appendChild(roundResult);
-
-const roundLog = document.createElement('p');
-roundLog.style.textAlign = 'left';
-roundLog.style.fontSize = '18px';
-roundMessage.appendChild(roundLog);
-
-resultsTextbox.appendChild(roundMessage);
-
-title.addEventListener('click', () => {
-
-  wrapper.removeChild(title);
-  wrapper.appendChild(gameControls);
-  wrapper.appendChild(resultsTextbox);
-  newGame();
-
-  const gameButtons = document.querySelectorAll('.game-control');
-
-  gameButtons.forEach(button => {
-
-    button.addEventListener('click', e => {
-
-      playRound(e.target.value, getComputerChoice());
-
-    });
-
-  });
-});
-
-
-wrapper.appendChild(title);
-
-//document.body.appendChild(wrapper);
-
-function getComputerChoice() {
-
-  return GAME_OPTIONS[Math.floor(Math.random() * 3)];
-
-}
-
-
-function playRound(playerSelection, computerSelection) {
-
-  let playerWins = true;
-
-  if (playerSelection === computerSelection) {
-
-    resolveRound('tie', playerSelection, computerSelection);
-
-  } else {
-
-    switch (playerSelection) {
-
-      case 'Rock':
-        playerWins = (computerSelection === 'Scissors');
-        break;
-
-      case 'Paper':
-        playerWins = (computerSelection === 'Rock');
-        break;
-
-      case 'Scissors':
-        playerWins = (computerSelection === 'Paper');
-        break;
-    }
-
-    resolveRound((playerWins) ? 'player' : 'computer', playerSelection, computerSelection);
-
-  }
-
-}
-
-function resolveRound(result, playerSelection, computerSelection) {
-
-  switch (result) {
-
-    case 'player':
-      playerScore++;
-      roundResult.textContent = 'YOU WIN!';
-      break;
-
-    case 'computer':
-      computerScore++;
-      roundResult.textContent = 'COMPUTER WINS!';
-      break;
-
-    default:
-      roundResult.textContent = 'TIE!';
-      break;
-  }
-
-  if (playerScore === 5 || computerScore === 5) {
-
-    roundResult.textContent = 'GAME OVER!';
-    roundLog.textContent = `${(playerScore > computerScore) ? 'Player' : 'Computer'} wins the game!`;
-    wrapper.removeChild(gameControls);
-
-  } else {
-
-    roundLog.textContent = `You selected ${playerSelection} and computer selected ${computerSelection}`;
-
-  }
-
-  score.textContent = `${playerScore} - ${computerScore}`;
-}
 
