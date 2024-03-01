@@ -116,8 +116,12 @@ class GameUI {
     return element;
   }
 
-  appendWithDelay(element, parent) {
-    setTimeout(() => parent.appendChild(element), GameUI.APPEND_DELAY);
+  appendWithDelay(element, parent, animationFn = null) {
+    setTimeout(() => { 
+      parent.appendChild(element);
+      if (animationFn) animationFn(element);
+    }, GameUI.APPEND_DELAY);
+
     setTimeout(() => element.classList.add('game-append'), GameUI.APPEND_ANIMATION_DELAY);
   }
 
@@ -155,6 +159,18 @@ class GameUI {
     
     return checkedIcon;
   }
+
+  // Specific animations
+
+  animateCheckedIcon(element) {
+    element.animate([
+        { transform: 'scale(0)' },
+        { transform: 'scale(1)' }
+    ], {
+        duration: 200,
+        easing: 'ease-in-out'
+    });
+}
 
   // Loading key resources
 
@@ -323,7 +339,11 @@ class GameUI {
     }
 
     if (isSelected) {
-      this.loadingOverlay.appendChild(this.checkedIcon);
+      this.appendWithDelay(
+        this.checkedIcon, 
+        this.loadingOverlay,
+        this.animateCheckedIcon.bind(this)
+      );
     } else {
       this.loadingWheel = this.createLottieAnimation(
         'https://lottie.host/8588aecb-1b4b-48e1-a569-e63734975c1e/gA4wf2wLSp.json'
