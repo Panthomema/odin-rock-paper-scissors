@@ -4,6 +4,8 @@ class Game{
   #computerScore = 0;
   #playerSelection = null;
   #computerSelection = null;
+  static SHOW_RESULT_DELAY = 3000;
+  static COMP_MAX_DELAY = 10000;
 
   constructor() {
     this.GAME_OPTIONS = ['rock', 'paper', 'scissors'];
@@ -32,7 +34,7 @@ class Game{
   } 
 
   async getComputerSelection() {
-    const randomDelay = Math.floor(Math.random() * 15000) + 1000;
+    const randomDelay = Math.floor(Math.random() * Game.COMP_MAX_DELAY) + 1000;
     await this.delay(randomDelay);
 
     return this.generateComputerChoice();
@@ -55,7 +57,7 @@ class Game{
 
     const roundWinner = this.determineWinner();
     this.gameUI.showRoundResult(this.#computerSelection, roundWinner);
-    await this.delay(4000);
+    await this.delay(Game.SHOW_RESULT_DELAY);
     
     return roundWinner;
   }
@@ -87,6 +89,8 @@ class Game{
 }
 
 class GameUI {
+  static APPEND_DELAY = 500;
+  static APPEND_ANIMATION_DELAY = 1000;
 
   constructor() {
     this.header = document.querySelector('header');
@@ -113,8 +117,8 @@ class GameUI {
   }
 
   appendWithDelay(element, parent) {
-    setTimeout(() => parent.appendChild(element), 500);
-    setTimeout(() => element.classList.add('game-append'), 1000);
+    setTimeout(() => parent.appendChild(element), GameUI.APPEND_DELAY);
+    setTimeout(() => element.classList.add('game-append'), GameUI.APPEND_ANIMATION_DELAY);
   }
 
   createLottieAnimation(url) {
@@ -175,12 +179,12 @@ class GameUI {
 
   // UI renderization
 
-  removeFront() {
+  removeWelcome() {
     const startGameButton = document.querySelector('#start-game');
     const quote = document.querySelector('#quote');
     const rpsTitle = document.querySelector('#rps-title');
     
-    this.addClass([startGameButton, quote, rpsTitle], 'front-remove');
+    this.addClass([startGameButton, quote, rpsTitle], 'hidden');
     setTimeout(() => {
       this.removeElements([startGameButton, quote, rpsTitle])
     }, 500);
@@ -193,13 +197,13 @@ class GameUI {
   }
 
   renderHeader() {
-    this.roundInfo = this.createElement('h2', 'round-info', 'addable');
+    this.roundInfo = this.createElement('h2', 'round-info', 'hidden');
     this.appendWithDelay(this.roundInfo, this.header);
   }
 
   renderMain() {
     this.main = document.querySelector('main');
-    const playPage = this.createElement('div', 'play-page', 'addable');
+    const playPage = this.createElement('div', 'play-page', 'hidden');
 
     const computerArea = this.createArea('computer');
     const playerArea = this.createArea('player');
@@ -263,7 +267,7 @@ class GameUI {
       icons = Array.from(this.playerIcons.values());
     } else {
       icons = Array.from(this.computerIcons.values());
-      this.loadingOverlay = this.createOpponentOverlay();
+      this.createOpponentOverlay();
       controls.appendChild(this.loadingOverlay);
     }
 
@@ -275,8 +279,7 @@ class GameUI {
   }
 
   createOpponentOverlay() {
-    const loadingOverlay = this.createElement('div', 'loading-overlay');
-    return loadingOverlay;
+    this.loadingOverlay = this.createElement('div', 'loading-overlay');
   }
 
   createSelectionStatus(player) {
@@ -311,7 +314,7 @@ class GameUI {
 
   updateGameIconsOpacity(player, opacity, ...iconNames) {
     const icons = (player === 'player') ? this.playerIcons : this.computerIcons;
-    iconNames.forEach(name => icons.get(name).style.setProperty('opacity', opacity)); 
+    iconNames.forEach(name => icons.get(name).classList.toggle('hidden', opacity === 0)); 
   }
 
   updateOpponentOverlay(isSelected = false) {
@@ -416,22 +419,22 @@ class GameUI {
 
 }
 
-const game = new Game();
-
-
 document.addEventListener('DOMContentLoaded', () => {
   
   const startGameButton = document.querySelector('#start-game');
+
+  // Adds some basic click animation
   startGameButton.addEventListener('mousedown', () => {
     startGameButton.classList.add('clicked');
   });
-
   startGameButton.addEventListener('mouseup', () => {
     startGameButton.classList.remove('clicked');
   });
 
+  // Removes welcome page and starts the game
   startGameButton.addEventListener('click', () => {
-    game.gameUI.removeFront();
+    const game = new Game();
+    game.gameUI.removeWelcome();
     game.newGame(); 
   });
 });

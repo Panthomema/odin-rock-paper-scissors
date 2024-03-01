@@ -22,14 +22,14 @@
 
 @media (orientation: portrait) {
   :root {
-    --fs-checked-icon: 20vw;
+    --fs-checked-icon: 18vw;
     --size-game-icon: 20vw
   }
 }
 
 @media (orientation: landscape) {
   :root {
-    --fs-checked-icon: 10vw;
+    --fs-checked-icon: 8vw;
     --size-game-icon: 10vw;
   }
 }
@@ -56,7 +56,7 @@
   :root {
     --fs-h1: clamp(1.5rem, 10vw, 2.5rem);
     --fs-quot: clamp(1.5rem, 8vw, 3rem);
-    --fs-checked-icon: 25vw;
+    --fs-checked-icon: 22vw;
     --size-game-icon: 25vw;
   }
 }
@@ -64,7 +64,7 @@
 
 @media (max-width: 425px) and (orientation: landscape) {
   :root {
-    --fs-checked-icon: 15vw;
+    --fs-checked-icon: 12vw;
     --size-game-icon: 15vw;
   }
 }
@@ -146,17 +146,13 @@ button.clicked {
   transition: opacity 0.5s ease-in-out;
 }
 
-.front-remove {
+.hidden {
   opacity: 0;
-}
-
-.addable {
-  opacity: 0;
-  transition: opacity 0.5s ease-in;
 }
 
 .game-append {
   opacity: 1;
+  transition: opacity 0.5s ease-in;
 }
 
 /* Header */
@@ -275,6 +271,10 @@ main {
   gap: 5px;
 }
 
+.game-icon {
+  transition: opacity 0.3s ease-in-out;
+}
+
 .game-icon,
 .game-icon > image {
   height: var(--size-game-icon);
@@ -293,7 +293,7 @@ main {
   position: absolute;
   display: flex;
   justify-content: center;
-  align-items: center;;
+  align-items: center;
 }
 
 #loading-overlay i {
