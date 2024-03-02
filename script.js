@@ -1,11 +1,12 @@
-class Game{
-  #round = 1;
-  #playerScore = 0;
-  #computerScore = 0;
+class Game {
+  #round;
+  #playerScore;
+  #computerScore;
   #playerSelection = null;
   #computerSelection = null;
-  static SHOW_RESULT_DELAY = 3000;
-  static COMP_MAX_DELAY = 10000;
+  static SHOW_RESULT_DELAY = 2000;
+  static COMP_MAX_DELAY = 6000;
+  static POINTS_WIN = 5;
 
   constructor() {
     this.GAME_OPTIONS = ['rock', 'paper', 'scissors'];
@@ -13,16 +14,28 @@ class Game{
   }
 
   async newGame() {
+    this.#round = 1;
+    this.#playerScore = 0;
+    this.#computerScore = 0;
     this.gameUI.renderGame();
+
     let roundWinner;
 
-    while (this.#computerScore < 5 && this.#playerScore < 5) {
+    while (true) {
       this.newRound();
       roundWinner = await this.resolveRound();
-      this.updateValues(roundWinner);
+      this.updateScoreValues(roundWinner);
+
+      if (this.#playerScore >= Game.POINTS_WIN) {
+        this.finishGame('player');
+        return;
+      }
+
+      if (this.#computerScore >= Game.POINTS_WIN) {
+        this.finishGame('computer');
+        return;
+      }
     }
-  
-    // this.finishGame();
   }
 
   newRound() {
@@ -49,7 +62,7 @@ class Game{
     return Promise.all([
       this.getComputerSelection(),
       this.gameUI.getPlayerSelection(),
-    ])
+    ]);
   }
 
   async resolveRound() {
@@ -74,7 +87,7 @@ class Game{
     return result || null;
   }
 
-  updateValues(roundWinner) {
+  updateScoreValues(roundWinner) {
     this.#round++;
     this.#playerSelection = null;
     this.#computerSelection = null;
@@ -83,28 +96,53 @@ class Game{
     if (roundWinner === 'computer') this.#computerScore++;
   }
 
-  finishGame() {
-    // Should show a modal, with the result and a button to restart the game
+  finishGame(gameWinner) {
+    this.gameUI.showGameResult(
+      gameWinner,
+      this.#playerScore, 
+      this.#computerScore
+    );
+
+    this.gameUI.setRestartButton(this.restartGame.bind(this));
+  }
+
+  restartGame() {
+    this.gameUI.removeModal();
+    this.gameUI.refreshGameUI();
+    this.gameUI = new GameUI();
+    this.newGame();
   }
 }
 
 class GameUI {
-  static APPEND_DELAY = 500;
-  static APPEND_ANIMATION_DELAY = 1000;
+  static APPEND_GAME_DELAY = 500;
+  static SHOW_GAME_DELAY = 1000;
+  static APPEND_CHECK_DELAY = 300;
+  static SHOW_CHECK_DELAY = 600;
+  static APPEND_RESULT_DELAY = 200;
+  static SHOW_RESULT_DELAY = 400;
+  static APPEND_MODAL_DELAY = 400;
+  static SHOW_MODAL_DELAY = 800;
+  static SCORE_NODES = 5;
 
   constructor() {
     this.header = document.querySelector('header');
     this.main = document.querySelector('main');
     this.footer = document.querySelector('footer');
+    this.wrapper = document.querySelector('#wrapper');
   }
 
   // General purpose functions
 
-  addClass(elements, className) {
+  addClassToElements(className, ...elements) {
     elements.forEach(element => element.classList.add(className));
   }
 
-  removeElements(elements) {
+  appendElements(parent, ...elements) {
+    elements.forEach(element => parent.appendChild(element));
+  }
+
+  removeElements(...elements) {
     elements.forEach(element => element.remove());
   }
 
@@ -116,13 +154,15 @@ class GameUI {
     return element;
   }
 
-  appendWithDelay(element, parent, animationFn = null) {
+  appendWithDelay(element, parent, appendDelay, showDelay, animationFn = null) {
     setTimeout(() => { 
       parent.appendChild(element);
       if (animationFn) animationFn(element);
-    }, GameUI.APPEND_DELAY);
+    }, appendDelay);
 
-    setTimeout(() => element.classList.add('game-append'), GameUI.APPEND_ANIMATION_DELAY);
+    setTimeout(() => {
+      element.classList.add('game-append') 
+    }, showDelay);
   }
 
   createLottieAnimation(url) {
@@ -145,7 +185,10 @@ class GameUI {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     classNames.forEach(name => svg.classList.add(name));
     
-    const image = document.createElementNS("http://www.w3.org/2000/svg", "image");
+    const image = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+       "image"
+    );
     image.setAttribute('href', url);
     
     svg.appendChild(image);
@@ -160,9 +203,15 @@ class GameUI {
     return checkedIcon;
   }
 
+  removeAllChilds(parentElement) {
+    while (parentElement.firstChild) {
+      parentElement.removeChild(parentElement.firstChild);
+    }
+  }
+
   // Specific animations
 
-  animateCheckedIcon(element) {
+  growElement(element) {
     element.animate([
         { transform: 'scale(0)' },
         { transform: 'scale(1)' }
@@ -170,7 +219,7 @@ class GameUI {
         duration: 200,
         easing: 'ease-in-out'
     });
-}
+  }
 
   // Loading key resources
 
@@ -199,10 +248,17 @@ class GameUI {
     const startGameButton = document.querySelector('#start-game');
     const quote = document.querySelector('#quote');
     const rpsTitle = document.querySelector('#rps-title');
-    
-    this.addClass([startGameButton, quote, rpsTitle], 'hidden');
+    const copyright = document.querySelector('#copyright');
+
+    this.addClassToElements(
+      'hidden',
+      startGameButton, 
+      quote, 
+      rpsTitle, 
+      copyright
+    );
     setTimeout(() => {
-      this.removeElements([startGameButton, quote, rpsTitle])
+      this.removeElements(startGameButton, quote, rpsTitle, copyright)
     }, 500);
   }
 
@@ -210,11 +266,17 @@ class GameUI {
     this.loadResources();
     this.renderHeader();
     this.renderMain();
+    this.footer.style.setProperty('align-items', 'center');
   }
 
   renderHeader() {
     this.roundInfo = this.createElement('h2', 'round-info', 'hidden');
-    this.appendWithDelay(this.roundInfo, this.header);
+    this.appendWithDelay(
+      this.roundInfo,
+      this.header,
+      GameUI.APPEND_GAME_DELAY,
+      GameUI.SHOW_GAME_DELAY
+    );
   }
 
   renderMain() {
@@ -227,7 +289,12 @@ class GameUI {
     playPage.appendChild(computerArea);
     playPage.appendChild(playerArea);
 
-    this.appendWithDelay(playPage, this.main);
+    this.appendWithDelay(
+      playPage, 
+      this.main,
+      GameUI.APPEND_GAME_DELAY,
+      GameUI.SHOW_GAME_DELAY
+    );
   }
 
   // UI Elements creation
@@ -267,7 +334,7 @@ class GameUI {
   createScoreNodes() {
     const score = this.createElement('div', undefined, 'score-nodes');
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < GameUI.SCORE_NODES; i++) {
       const filledScoreNode = this.createFAsIcon('far', 'fa-circle');
       score.appendChild(filledScoreNode);
     }
@@ -299,7 +366,11 @@ class GameUI {
   }
 
   createSelectionStatus(player) {
-    const statusMessage = this.createElement('div', undefined, 'selection-status');
+    const statusMessage = this.createElement(
+      'div', 
+      undefined, 
+      'selection-status'
+    );
     if (player === 'player') {
       this.playerStatusMessage = statusMessage;
     } else {
@@ -307,6 +378,14 @@ class GameUI {
     }
     
     return statusMessage;
+  }
+
+  createEndGameModal() {
+    this.endGameModal = this.createElement('div', 'end-modal');
+    this.winnerInfo = this.createElement('h2', 'winner-info');
+    this.result = this.createElement('h1', 'final-score');
+    this.restartButton = this.createElement('button', 'restart-btn');
+    this.restartButton.textContent = 'Play Again';
   }
 
 
@@ -330,19 +409,23 @@ class GameUI {
 
   updateGameIconsOpacity(player, opacity, ...iconNames) {
     const icons = (player === 'player') ? this.playerIcons : this.computerIcons;
-    iconNames.forEach(name => icons.get(name).classList.toggle('hidden', opacity === 0)); 
+    iconNames.forEach(name => {
+      icons.get(name).classList.toggle('hidden', opacity === 0)
+    }); 
   }
 
   updateOpponentOverlay(isSelected = false) {
-    if (this.loadingOverlay.firstChild) {
-      this.loadingOverlay.removeChild(this.loadingOverlay.firstChild);
+    if (this.loadingOverlay.firstElementChild) {
+      this.loadingOverlay.removeChild(this.loadingOverlay.firstElementChild);
     }
 
     if (isSelected) {
       this.appendWithDelay(
         this.checkedIcon, 
         this.loadingOverlay,
-        this.animateCheckedIcon.bind(this)
+        GameUI.APPEND_CHECK_DELAY,
+        GameUI.SHOW_CHECK_DELAY,
+        this.growElement.bind(this)
       );
     } else {
       this.loadingWheel = this.createLottieAnimation(
@@ -365,6 +448,45 @@ class GameUI {
     }
   }
 
+  updateRoundResultText(roundWinner) {
+    if (roundWinner === undefined) {
+      if (this.footer.firstElementChild) {
+        this.footer.removeChild(this.footer.firstElementChild);
+      }
+      return;
+    }
+
+    const roundResultText = this.createElement('h3', 'round-result');
+    switch (roundWinner) {
+      case 'player':
+        roundResultText.textContent = 'YOU WIN!';
+        break;
+      
+      case 'computer':
+        roundResultText.textContent = 'YOU LOSE!';
+        break;
+
+      default:
+        roundResultText.textContent = 'TIE!';
+        break;
+    }
+
+    this.appendWithDelay(
+      roundResultText, 
+      this.footer,
+      GameUI.APPEND_RESULT_DELAY,
+      GameUI.SHOW_RESULT_DELAY
+    );
+  }
+
+  updateEndGameModal(winner, playerScore, computerScore) {   
+    this.winnerInfo.textContent = (winner === 'player')
+                              ? 'YOU WIN!'
+                              : 'YOU LOSE!';
+    
+    this.result.textContent = `${playerScore} - ${computerScore}`; 
+  }
+
 
   // Game flux control
 
@@ -375,6 +497,7 @@ class GameUI {
     this.loadingOverlay.style.setProperty('opacity', 1);
     this.updateSelectionStatus('player');
     this.updateSelectionStatus('computer');
+    this.updateRoundResultText();
   }
 
   showComputerHasSelected() { 
@@ -422,6 +545,8 @@ class GameUI {
     if (winner) {
       this.updateScoreNodes(winner);
     }
+    
+    this.updateRoundResultText(winner);
   }
 
   restoreGameIcons() {
@@ -437,6 +562,38 @@ class GameUI {
     );
   }
 
+  showGameResult(winner, playerScore, computerScore) {
+    if (!this.endGameModal) this.createEndGameModal();
+    this.updateEndGameModal(winner, playerScore, computerScore);
+
+    this.appendElements(
+      this.endGameModal, 
+      this.winnerInfo, 
+      this.result, 
+      this.restartButton
+    );
+
+    this.appendWithDelay(
+      this.endGameModal,
+      this.wrapper,
+      GameUI.APPEND_MODAL_DELAY,
+      GameUI.SHOW_MODAL_DELAY
+    );
+  }
+
+  setRestartButton(restartFn) {
+    this.restartButton.addEventListener('click', () => restartFn());
+  }
+
+  removeModal() {
+    this.endGameModal.remove();
+  }
+
+  refreshGameUI() {
+    [this.header, this.main, this.footer].forEach(elem => {
+      this.removeAllChilds(elem);
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
