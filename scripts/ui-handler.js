@@ -1,8 +1,8 @@
-import { UIHelper } from "./ui-helper";
+import { UIHelper } from "./ui-helper.js";
 
 export class UIHandler {
   constructor() {
-
+    
   }
 
   removeWelcome() {
