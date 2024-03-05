@@ -1,4 +1,4 @@
-import UIHandler from "./ui-handler";
+import { UIHandler } from "./ui-handler.js";
 
 export class Game {
   #round;

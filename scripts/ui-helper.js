@@ -1,4 +1,4 @@
-export default class UIHelper {
+export class UIHelper {
   static addClassToElements(className, ...elements) {
     elements.forEach(element => element.classList.add(className));
   }

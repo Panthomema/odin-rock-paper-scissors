@@ -1,6 +1,6 @@
-import UIHelper from "./ui-helper";
+import { UIHelper } from "./ui-helper";
 
-export default class UIHandler {
+export class UIHandler {
   constructor() {
 
   }
