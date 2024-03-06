@@ -130,10 +130,14 @@ button.clicked {
   border-color: var(--btn-clicked);
 }
 
-/* Transition toggle classes */
+/* Transitions / Animations general selectors */
 
-.removable {
+.remove-welcome-transition {
   transition: opacity 0.5s ease-in-out;
+}
+
+.append-ui-transition {
+  transition: opacity 0.5s ease-in;
 }
 
 .hidden {
@@ -142,7 +146,7 @@ button.clicked {
 
 .game-append {
   opacity: 1;
-  transition: opacity 0.5s ease-in;
+  
 }
 
 /* Header */

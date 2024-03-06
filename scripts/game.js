@@ -1,6 +1,7 @@
 import { UIHandler } from "./ui-handler.js";
 
-export class Game {
+export class Game 
+{
   #round;
   #playerScore;
   #computerScore;
@@ -12,14 +13,14 @@ export class Game {
 
   constructor() {
     this.GAME_OPTIONS = ['rock', 'paper', 'scissors'];
-    this.uiHandler = new UIHandler();
+    this.uiHandler = new UIHandler(Game.MAX_POINTS);
   }
 
   async newGame() {
     this.#round = 1;
     this.#playerScore = 0;
     this.#computerScore = 0;
-    this.gameUI.renderGame();
+    this.uiHandler.appendGameUI();
 
     let roundWinner;
 
@@ -41,7 +42,7 @@ export class Game {
   }
 
   newRound() {
-    this.gameUI.renderNewRound(this.#round);
+    this.uiHandler.setNewRound(this.#round);
   }
 
   delay(ms) {
