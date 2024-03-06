@@ -1,13 +1,13 @@
-import { UIHelper } from "./ui-helper.js";
+import { Utils } from "../utils.js";
 
 export class LoadingOverlay 
 {
+  static APPEND_CHECK_DELAY = 300;
+  static SHOW_CHECK_DELAY = 600;
+
   constructor() {
-    this.htmlElement = UIHelper.createElement('div', 'loading-overlay');
-    this.loadingSpinner = UIHelper.createLottieAnimation(
-      'https://lottie.host/8588aecb-1b4b-48e1-a569-e63734975c1e/gA4wf2wLSp.json'
-    );
-    this.checkedIcon = UIHelper.createFAsIcon('fas', 'fa-check');
+    this.htmlElement = Utils.createElement('div', 'loading-overlay');
+    this.checkedIcon = Utils.createFAsIcon('fas', 'fa-check');
   }
 
   clear() {
@@ -17,7 +17,23 @@ export class LoadingOverlay
   }
 
   appendLoadingSpinner() {
+    // Lottie animation needs to be initialized every time u append it again
+    this.loadingSpinner = Utils.createLottieAnimation(
+      'https://lottie.host/8588aecb-1b4b-48e1-a569-e63734975c1e/gA4wf2wLSp.json'
+    );
+
     this.htmlElement.appendChild(this.loadingSpinner);
+  }
+
+  appendCheckedIcon() {
+    Utils.appendWithDelay(
+      this.htmlElement,
+      this.checkedIcon,
+      'append-check-transition',
+      LoadingOverlay.APPEND_CHECK_DELAY,
+      LoadingOverlay.SHOW_CHECK_DELAY,
+      Utils.growElement
+    );
   }
 }
 

@@ -1,8 +1,8 @@
-import { UIHelper } from "./ui-helper.js";
+import { Utils } from "../utils.js";
 
 export class RoundInfo {
   constructor() {
-    this.htmlElement = UIHelper.createElement('h2', 'round-info', 'hidden');
+    this.htmlElement = Utils.createElement('h2', 'round-info', 'hidden');
   }
 
   update(roundNum) {

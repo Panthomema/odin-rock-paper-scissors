@@ -1,6 +1,7 @@
+import { Utils } from "./utils.js";
 import { UIHandler } from "./ui-handler.js";
 
-export class Game 
+export class GameHandler 
 {
   #round;
   #playerScore;
@@ -8,12 +9,12 @@ export class Game
   #playerSelection = null;
   #computerSelection = null;
   static SHOW_RESULT_DELAY = 2000;
-  static COMP_MAX_DELAY = 6000;
+  static COMPUTER_MAX_DELAY = 6000;
   static MAX_POINTS = 5;
 
   constructor() {
     this.GAME_OPTIONS = ['rock', 'paper', 'scissors'];
-    this.uiHandler = new UIHandler(Game.MAX_POINTS);
+    this.uiHandler = new UIHandler(GameHandler.MAX_POINTS);
   }
 
   async newGame() {
@@ -25,7 +26,7 @@ export class Game
     let roundWinner;
 
     while (true) {
-      this.newRound();
+      this.uiHandler.setNewRound();
       roundWinner = await this.resolveRound();
       this.updateScoreValues(roundWinner);
 
@@ -41,41 +42,36 @@ export class Game
     }
   }
 
-  newRound() {
-    this.uiHandler.setNewRound(this.#round);
-  }
-
-  delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  } 
-
-  async getComputerSelection() {
-    const randomDelay = Math.floor(Math.random() * Game.COMP_MAX_DELAY) + 1000;
-    await this.delay(randomDelay);
-
-    return this.generateComputerChoice();
-  }
-
-  generateComputerChoice() {
-    this.gameUI.showComputerHasSelected('computer');
-    return this.GAME_OPTIONS[Math.floor(Math.random() * 3)];
-  }
-
-  async playRound() {
-    return Promise.all([
-      this.getComputerSelection(),
-      this.gameUI.getPlayerSelection(),
-    ]);
-  }
-
   async resolveRound() {
     [this.#computerSelection, this.#playerSelection] = await this.playRound();
 
     const roundWinner = this.determineWinner();
     this.gameUI.showRoundResult(this.#computerSelection, roundWinner);
-    await this.delay(Game.SHOW_RESULT_DELAY);
-    
+    await Utils.delay(Game.SHOW_RESULT_DELAY);
+
     return roundWinner;
+  }
+
+  async playRound() {
+    return Promise.all([
+      this.getComputerSelection(),
+      this.uiHandler.getPlayerSelection(),
+    ]);
+  }
+
+  async getComputerSelection() {
+    const randomDelay = Math.floor(
+      Math.random() * GameHandler.COMPUTER_MAX_DELAY
+    ) + 1000;
+
+    await Utils.delay(randomDelay);
+
+    return this.generateComputerChoice();
+  }
+
+  generateComputerChoice() {
+    this.uiHandler.showComputerHasSelected();
+    return this.GAME_OPTIONS[Math.floor(Math.random() * 3)];
   }
 
   determineWinner() {
@@ -102,7 +98,7 @@ export class Game
   finishGame(gameWinner) {
     this.gameUI.showGameResult(
       gameWinner,
-      this.#playerScore, 
+      this.#playerScore,
       this.#computerScore
     );
 

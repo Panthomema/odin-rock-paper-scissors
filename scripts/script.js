@@ -1,4 +1,4 @@
-import { Game } from "./game.js";
+import { GameHandler } from "./game-handler.js";
 
 document.addEventListener('DOMContentLoaded', () => {
   
@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Removes welcome page and starts the game
   startGameButton.addEventListener('click', () => {
-    const game = new Game();
-    game.uiHandler.removeWelcome();
-    game.newGame(); 
+    const gameHandler = new GameHandler();
+    gameHandler.uiHandler.removeWelcome();
+    gameHandler.newGame(); 
   });
 });

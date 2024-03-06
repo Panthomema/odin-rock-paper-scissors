@@ -1,4 +1,4 @@
-export class UIHelper 
+export class Utils
 {
   static addClassToElements(className, ...elements) {
     elements.forEach(element => element.classList.add(className));
@@ -76,4 +76,18 @@ export class UIHelper
 
     return svg;
   }
+
+  static growElement(element) {
+    element.animate([
+        { transform: 'scale(0)' },
+        { transform: 'scale(1)' }
+    ], {
+        duration: 200,
+        easing: 'ease-in-out'
+    });
+  }
+
+  static delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  } 
 }

@@ -1,20 +1,20 @@
-import { UIHelper } from "./ui-helper.js";
+import { Utils } from "../utils.js";
 
 export class Scoreboard 
 {
   static COMPUTER_HEADER = `OPPONENT'S SCORE`;
   static PLAYER_HEADER = 'YOUR SCORE';
-  
+
   constructor(maxPoints, headerContent) {
-    this.htmlElement = UIHelper.createElement('div', undefined, 'scoreboard');
+    this.htmlElement = Utils.createElement('div', undefined, 'scoreboard');
     
-    const header = UIHelper.createElement('h3');
+    const header = Utils.createElement('h3');
     header.textContent = headerContent
 
-    this.scoreNodes = UIHelper.createElement('div', undefined, 'score-nodes');
+    this.scoreNodes = Utils.createElement('div', undefined, 'score-nodes');
 
     for (let i = 0; i < maxPoints; i++) {
-      const filledScoreNode = UIHelper.createFAsIcon('far', 'fa-circle');
+      const filledScoreNode = Utils.createFAsIcon('far', 'fa-circle');
       this.scoreNodes.appendChild(filledScoreNode);
     }
 

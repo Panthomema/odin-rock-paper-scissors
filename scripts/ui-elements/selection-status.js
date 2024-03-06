@@ -1,4 +1,4 @@
-import { UIHelper } from "./ui-helper.js";
+import { Utils } from "../utils.js";
 
 export class SelectionStatus
 {
@@ -6,9 +6,9 @@ export class SelectionStatus
   static PLAYER_WAITING_TEXT = 'Take yor pick';
   static COMPUTER_SELECTED_TEXT = 'Opponent made a pick';
   static PLAYER_SELECTED_TEXT = 'You made a pick';
-  
+
   constructor() {
-    this.htmlElement = UIHelper.createElement(
+    this.htmlElement = Utils.createElement(
       'div', undefined, 'selection-status'
     );
   }

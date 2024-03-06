@@ -1,11 +1,14 @@
-import { UIHelper } from "./ui-helper.js";
+import { Utils } from "../utils.js";
 
 export class PlayPage
 {
   constructor(computerAreaElements, playerAreaElements) {
-    this.htmlElement = UIHelper.createElement('div', 'play-page', 'hidden');
-    this.computerArea = UIHelper.createElement('div', 'computer-area');
-    this.playerArea = UIHelper.createElement('div', 'player-area');
+    this.htmlElement = Utils.createElement(
+      'div', 'play-page', 'hidden'
+    );
+
+    this.computerArea = Utils.createElement('div', 'computer-area');
+    this.playerArea = Utils.createElement('div', 'player-area');
 
     const pairsToAppend = new Map([
       [
@@ -22,7 +25,7 @@ export class PlayPage
     ]);
 
     pairsToAppend.entries().forEach(([parent, elements]) => {
-      UIHelper.appendElements(parent, ...elements);
+      Utils.appendElements(parent, ...elements);
     });
   }
 }

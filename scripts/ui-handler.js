@@ -1,11 +1,11 @@
-import { UIHelper } from "./ui-helper.js";
-import { RoundInfo } from "./round-info.js";
-import { Scoreboard } from "./scoreboard.js";
-import { GameControls } from "./game-controls.js";
-import { LoadingOverlay } from "./loading-overlay.js";
-import { SelectionStatus } from "./selection-status.js";
-import { RoundResultInfo } from "./round-result-info.js";
-import { PlayPage } from "./play-page.js";
+import { Utils } from "./utils.js";
+import { RoundInfo } from "./ui-elements/round-info.js";
+import { Scoreboard } from "./ui-elements/scoreboard.js";
+import { GameControls } from "./ui-elements/game-controls.js";
+import { LoadingOverlay } from "./ui-elements/loading-overlay.js";
+import { SelectionStatus } from "./ui-elements/selection-status.js";
+import { RoundResultInfo } from "./ui-elements/round-result-info.js";
+import { PlayPage } from "./ui-elements/play-page.js";
 
 export class UIHandler 
 {
@@ -46,7 +46,7 @@ export class UIHandler
     const rpsTitle = document.querySelector('#rps-title');
     const copyright = document.querySelector('#copyright');
 
-    UIHelper.addClassToElements(
+    Utils.addClassToElements(
       'hidden',
       startGameButton, 
       quote, 
@@ -55,7 +55,7 @@ export class UIHandler
     );
 
     setTimeout(() => {
-      UIHelper.removeElements(startGameButton, quote, rpsTitle, copyright)
+      Utils.removeElements(startGameButton, quote, rpsTitle, copyright)
     }, UIHandler.REMOVE_WELCOME_TIMEOUT);
   }
 
@@ -67,7 +67,7 @@ export class UIHandler
     ]);
 
     pairsToAppend.entries().forEach(([parent, element]) => {
-      UIHelper.appendWithDelay(
+      Utils.appendWithDelay(
         parent, 
         element,
         'append-ui-transition', 
@@ -99,5 +99,22 @@ export class UIHandler
       .setContent(SelectionStatus.PLAYER_WAITING_TEXT);
     
     this.roundResultInfo.clear();
+  }
+
+  showComputerHasSelected() { 
+    this.loadingOverlay.clear();
+    this.loadingOverlay.appendCheckedIcon();
+    this.computerAreaElements.get('selectionStatus')
+      .setContent(SelectionStatus.COMPUTER_SELECTED_TEXT);
+  }
+
+  async getPlayerSelection() {
+    return await this.playerAreaElements.get('controls').attachPlayerSelectionEvents(this.showPlayerHasSelected.bind(this));
+  }
+
+  
+  showPlayerHasSelected(selection) {
+    this.playerAreaElements.get('selectionStatus')
+      .setContent(SelectionStatus.PLAYER_SELECTED_TEXT);
   }
 }
