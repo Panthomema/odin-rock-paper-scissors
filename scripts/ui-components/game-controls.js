@@ -8,19 +8,24 @@ export class GameControls
     ['scissors', 'https://img.icons8.com/3d-fluency/200/cut.png']
   ]);
 
+  // Creates a Map with created SVG elements from the sources given
   static createIconMap = ([name, url]) => {
-    return [name, Utils.createSVGIcon(url, 'game-icon')];
+    return [
+      name, 
+      Utils.createSVGIcon(url, 'game-icon', 'opacity-icons-transition')
+    ];
   }
 
   constructor(loadingOverlay = null) {
     this.htmlElement = Utils.createElement(
       'div', undefined, 'game-controls'
     );
-
+  
     this.iconsMap = new Map(
       Array.from(GameControls.ICON_URLS, GameControls.createIconMap)
     );
 
+    // Appends loading overlay only in case it is provided
     Utils.appendElements(
       this.htmlElement,
       ...this.iconsMap.values(),
@@ -29,16 +34,18 @@ export class GameControls
   }
 
   appendOverlay(overlay) {
+    if (this.htmlElement.contains(overlay.htmlElement)) return;
     this.htmlElement.appendChild(overlay.htmlElement);
   }
 
   removeOverlay(overlay) {
+    if (!this.htmlElement.contains(overlay.htmlElement)) return;
     this.htmlElement.removeChild(overlay.htmlElement);
   }
 
   updateIconsOpacity(opacity, ...iconNames) {
     iconNames.forEach(name => {
-      this.iconsMap.get(name).classList.toggle('hidden', opacity === 0)
+      this.iconsMap.get(name).classList.toggle('hidden', opacity === 0);
     });
   }
 
@@ -50,31 +57,4 @@ export class GameControls
     this.updateIconsOpacity(1, ...this.iconsMap.keys());
   }
 
-  attachPlayerSelectionEvents(callbackFn) {
-    return new Promise(resolve => {
-      const icons = Array.from(this.iconsMap.entries());
-
-      const clickHandler = iconName => {
-        callbackFn(iconName);
-        resolve(iconName);
-
-        icons
-          .filter(([name, _]) => name !== iconName)
-          .forEach(([name, _]) => this.updateIconsOpacity(0, name));      
-      }
-
-      const removeListeners = () => {
-        icons.forEach(([_, icon]) => {
-          icon.removeEventListener('click', clickHandler);
-        });
-      }
-
-      icons.forEach(([name, icon]) => {
-        icon.addEventListener('click', () => {
-          clickHandler(name);
-          removeListeners();
-        });
-      }) 
-    });
-  }
 }

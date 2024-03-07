@@ -39,6 +39,21 @@ export class Utils
     }, showDelay);
   }
 
+  static removeWithDelay(
+    element, transitionClass, hideDelay, removeDelay, animationFn = null 
+  ) {
+    element.classList.add(transitionClass);
+
+    setTimeout(() => { 
+      if (animationFn) animationFn(element);
+      element.classList.add('hidden');
+    }, hideDelay);
+
+    setTimeout(() => {
+      element.remove('hidden');
+    }, removeDelay);
+  }
+
   static createFAsIcon(prefix, iconName) {
     const checkedIcon = document.createElement('i');
     checkedIcon.classList.add(prefix, iconName);
@@ -89,5 +104,9 @@ export class Utils
 
   static delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  } 
+  }
+
+  static getKey(map, searchValue) {
+    return [...map.entries()].find(([_, value]) => value === searchValue)?.[0];
+  }
 }

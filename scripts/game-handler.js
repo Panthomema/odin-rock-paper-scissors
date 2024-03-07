@@ -6,16 +6,17 @@ export class GameHandler
   #round;
   #playerScore;
   #computerScore;
-  #playerSelection = null;
-  #computerSelection = null;
+  #playerSelection;
+  #computerSelection;
   static SHOW_RESULT_DELAY = 2000;
   static COMPUTER_MAX_DELAY = 6000;
-  static MAX_POINTS = 5;
+  static MAX_POINTS = 1;
+  static GAME_OPTIONS = ['rock', 'paper', 'scissors'];
 
   constructor() {
-    this.GAME_OPTIONS = ['rock', 'paper', 'scissors'];
     this.uiHandler = new UIHandler(GameHandler.MAX_POINTS);
   }
+
 
   async newGame() {
     this.#round = 1;
@@ -26,16 +27,16 @@ export class GameHandler
     let roundWinner;
 
     while (true) {
-      this.uiHandler.setNewRound();
+      this.uiHandler.setNewRound(this.#round);
       roundWinner = await this.resolveRound();
       this.updateScoreValues(roundWinner);
 
-      if (this.#playerScore >= Game.MAX_POINTS) {
+      if (this.#playerScore >= GameHandler.MAX_POINTS) {
         this.finishGame('player');
         return;
       }
 
-      if (this.#computerScore >= Game.MAX_POINTS) {
+      if (this.#computerScore >= GameHandler.MAX_POINTS) {
         this.finishGame('computer');
         return;
       }
@@ -45,9 +46,12 @@ export class GameHandler
   async resolveRound() {
     [this.#computerSelection, this.#playerSelection] = await this.playRound();
 
+    // Proceeds when player and computer have selected
     const roundWinner = this.determineWinner();
-    this.gameUI.showRoundResult(this.#computerSelection, roundWinner);
-    await Utils.delay(Game.SHOW_RESULT_DELAY);
+    this.uiHandler.showRoundResult(this.#computerSelection, roundWinner);
+
+    // Keeps showing the result a little time
+    await Utils.delay(GameHandler.SHOW_RESULT_DELAY);
 
     return roundWinner;
   }
@@ -71,7 +75,7 @@ export class GameHandler
 
   generateComputerChoice() {
     this.uiHandler.showComputerHasSelected();
-    return this.GAME_OPTIONS[Math.floor(Math.random() * 3)];
+    return GameHandler.GAME_OPTIONS[Math.floor(Math.random() * 3)];
   }
 
   determineWinner() {
@@ -95,20 +99,18 @@ export class GameHandler
     if (roundWinner === 'computer') this.#computerScore++;
   }
 
-  finishGame(gameWinner) {
-    this.gameUI.showGameResult(
-      gameWinner,
-      this.#playerScore,
-      this.#computerScore
+  finishGame(winner) {
+    this.uiHandler.showGameResult(
+      winner,
+      this.#computerScore,
+      this.#playerScore
     );
 
-    this.gameUI.setRestartButton(this.restartGame.bind(this));
+    this.uiHandler.setRestartButton(this.restartGame.bind(this));
   }
 
   restartGame() {
-    this.gameUI.removeModal();
-    this.gameUI.refreshGameUI();
-    this.gameUI = new GameUI();
+    this.uiHandler.prepareNextGame();
     this.newGame();
   }
 }
