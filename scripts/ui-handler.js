@@ -15,7 +15,8 @@ export class UIHandler
   static APPEND_GAMEUI_DELAY = 500;
   static SHOW_GAMEUI_DELAY = 1000;
 
-  constructor(maxPoints) {
+  // Receives a resetFn from GameHandler
+  constructor(maxPoints, resetFn) {
     this.header = document.querySelector('header');
     this.main = document.querySelector('main');
     this.footer = document.querySelector('footer');
@@ -41,7 +42,7 @@ export class UIHandler
       this.computerAreaElements, this.playerAreaElements
     );
 
-    this.endGameModal = new EndGameModal();
+    this.endGameModal = new EndGameModal(resetFn);
   }
 
   removeWelcome() {
@@ -165,11 +166,6 @@ export class UIHandler
   showGameResult(winner, playerSelection, computerSelection) {
     this.endGameModal.update(winner, playerSelection, computerSelection);
     this.endGameModal.append(this.playPage);
-  }
-
-  // Receives a function from the game-handler
-  setRestartButton(resetFn) {
-    this.endGameModal.restartButton.addEventListener('click', () => resetFn());
   }
 
   prepareNextGame() {

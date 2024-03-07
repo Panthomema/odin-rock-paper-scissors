@@ -8,13 +8,15 @@ export class EndGameModal
   static APPEND_DELAY = 400;
   static SHOW_DELAY = 800;
 
-  constructor() {
+  // Receives a resetFn from GameHandler -> UIHandler to assign to the button
+  constructor(resetFn) {
     this.htmlElement = Utils.createElement('div', 'end-modal', 'hidden');
     
     this.winnerInfo = Utils.createElement('h2', 'winner-info');
     this.result = Utils.createElement('h1', 'final-score');
     this.restartButton = Utils.createElement('button', 'restart-btn');
     this.restartButton.textContent = 'Play Again';
+    this.restartButton.addEventListener('click', resetFn);
 
     Utils.appendElements(
       this.htmlElement, 

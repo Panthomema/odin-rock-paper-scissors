@@ -83,7 +83,7 @@ export class Utils
     
     const image = document.createElementNS(
       "http://www.w3.org/2000/svg",
-       "image"
+      "image"
     );
     image.setAttribute('href', url);
     
