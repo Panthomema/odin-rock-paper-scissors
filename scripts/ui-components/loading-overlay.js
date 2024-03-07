@@ -4,6 +4,8 @@ export class LoadingOverlay
 {
   static APPEND_CHECK_DELAY = 300;
   static SHOW_CHECK_DELAY = 600;
+  static APPEND_LOADING_DELAY = 300;
+  static SHOW_LOADING_DELAY = 600;
 
   constructor() {
     this.htmlElement = Utils.createElement('div', 'loading-overlay');
@@ -11,6 +13,7 @@ export class LoadingOverlay
   }
 
   clear() {
+    // Removes only elements (ignoring text nodes, for example)
     if (this.htmlElement.firstElementChild) {
       this.htmlElement.removeChild(this.htmlElement.firstElementChild);
     }
@@ -22,7 +25,13 @@ export class LoadingOverlay
       'https://lottie.host/8588aecb-1b4b-48e1-a569-e63734975c1e/gA4wf2wLSp.json'
     );
 
-    this.htmlElement.appendChild(this.loadingSpinner);
+    Utils.appendWithDelay(
+      this.htmlElement,
+      this.loadingSpinner,
+      'append-loading-transition',
+      LoadingOverlay.APPEND_LOADING_DELAY,
+      LoadingOverlay.SHOW_LOADING_DELAY
+    );
   }
 
   appendCheckedIcon() {
@@ -34,27 +43,5 @@ export class LoadingOverlay
       LoadingOverlay.SHOW_CHECK_DELAY,
       Utils.growElement
     );
-  }
-}
-
-function updateOpponentOverlay(isSelected = false) {
-  if (this.loadingOverlay.firstElementChild) {
-    this.loadingOverlay.removeChild(this.loadingOverlay.firstElementChild);
-  }
-
-  if (isSelected) {
-    this.appendWithDelay(
-      this.checkedIcon, 
-      this.loadingOverlay,
-      GameUI.APPEND_CHECK_DELAY,
-      GameUI.SHOW_CHECK_DELAY,
-      this.growElement.bind(this)
-    );
-  } else {
-    this.loadingWheel = this.createLottieAnimation(
-      'https://lottie.host/8588aecb-1b4b-48e1-a569-e63734975c1e/gA4wf2wLSp.json'
-    );
-
-    this.loadingOverlay.appendChild(this.loadingWheel);
   }
 }

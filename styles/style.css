@@ -144,13 +144,24 @@ button.clicked {
   transition: opacity 0.3s ease-in;
 }
 
-.hidden {
-  opacity: 0;
+.append-laoding-transition {
+  transition: opacity 0.3s ease-in;
 }
 
-.game-append {
-  opacity: 1;
-  
+.opacity-icons-transition {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.append-result-transition {
+  transition: opacity 0.2s ease-in-out;
+}
+
+.append-modal-transition {
+  transition: opacity 0.4s ease-in;
+}
+
+.hidden {
+  opacity: 0;
 }
 
 /* Header */
@@ -267,10 +278,6 @@ main {
   display: flex;
   justify-content: space-between;
   gap: 5px;
-}
-
-.game-icon {
-  transition: opacity 0.3s ease-in-out;
 }
 
 .game-icon,

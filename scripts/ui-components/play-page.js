@@ -9,7 +9,8 @@ export class PlayPage
 
     this.computerArea = Utils.createElement('div', 'computer-area');
     this.playerArea = Utils.createElement('div', 'player-area');
-
+    
+    // Creates a Map that contains: [parent, [elemsToAppend]]
     const pairsToAppend = new Map([
       [
         this.computerArea, 
@@ -24,8 +25,15 @@ export class PlayPage
       ]
     ]);
 
+    // Executes append function for previously created pairs
     pairsToAppend.entries().forEach(([parent, elements]) => {
       Utils.appendElements(parent, ...elements);
     });
+  }
+
+  remove() {
+    if (!this.htmlElement.parentNode) return;
+    this.htmlElement.classList.add('hidden');
+    this.htmlElement.remove();
   }
 }

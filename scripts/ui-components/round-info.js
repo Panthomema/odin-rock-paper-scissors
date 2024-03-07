@@ -8,4 +8,10 @@ export class RoundInfo {
   update(roundNum) {
     this.htmlElement.textContent = `Round ${roundNum}`;
   }
+
+  remove() {
+    if (!this.htmlElement.parentNode) return;
+    this.htmlElement.classList.add('hidden');
+    this.htmlElement.remove();
+  }
 }
