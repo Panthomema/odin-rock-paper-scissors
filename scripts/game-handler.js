@@ -10,11 +10,13 @@ export class GameHandler
   #computerSelection;
   static SHOW_RESULT_DELAY = 2000;
   static COMPUTER_MAX_DELAY = 6000;
-  static MAX_POINTS = 1;
+  static MAX_POINTS = 5;
   static GAME_OPTIONS = ['rock', 'paper', 'scissors'];
 
   constructor() {
-    this.uiHandler = new UIHandler(GameHandler.MAX_POINTS);
+    this.uiHandler = new UIHandler(
+      GameHandler.MAX_POINTS, this.restartGame.bind(this)
+    );
   }
 
 
@@ -105,8 +107,6 @@ export class GameHandler
       this.#computerScore,
       this.#playerScore
     );
-
-    this.uiHandler.setRestartButton(this.restartGame.bind(this));
   }
 
   restartGame() {
