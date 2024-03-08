@@ -7,6 +7,8 @@ export class EndGameModal
   static DEFEAT_TXT = 'DEFEAT'
   static APPEND_DELAY = 400;
   static SHOW_DELAY = 800;
+  static HIDE_DELAY = 0;
+  static REMOVE_DELAY = 500;
 
   // Receives a resetFn from GameHandler -> UIHandler to assign to the button
   constructor(resetFn) {
@@ -47,8 +49,12 @@ export class EndGameModal
 
   remove() {
     if (!this.htmlElement.parentNode) return;
-    this.htmlElement.classList.add('hidden');
-    this.htmlElement.remove();
+    Utils.removeWithDelay(
+      this.htmlElement,
+      'remove-modal-transition',
+      EndGameModal.HIDE_DELAY,
+      EndGameModal.REMOVE_DELAY
+    );
   }
   
 }

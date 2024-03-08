@@ -10,8 +10,8 @@ import { EndGameModal } from "./ui-components/end-game-modal.js";
 
 export class UIHandler 
 {
-  static HIDE_WELCOME_TITLE = 0;
-  static REMOVE_WELCOME_TIMEOUT = 500;
+  static HIDE_WELCOME_DELAY = 0;
+  static REMOVE_WELCOME_DELAY = 500;
   static APPEND_GAMEUI_DELAY = 500;
   static SHOW_GAMEUI_DELAY = 1000;
 
@@ -55,8 +55,8 @@ export class UIHandler
       Utils.removeWithDelay(
         element,
         'remove-welcome-transition',
-        UIHandler.HIDE_WELCOME_TITLE,
-        UIHandler.REMOVE_WELCOME_TIMEOUT
+        UIHandler.HIDE_WELCOME_DELAY,
+        UIHandler.REMOVE_WELCOME_DELAY
       );
     });
   }

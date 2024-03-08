@@ -144,7 +144,7 @@ button.clicked {
   transition: opacity 0.3s ease-in;
 }
 
-.append-laoding-transition {
+.append-loading-transition {
   transition: opacity 0.3s ease-in;
 }
 
@@ -158,6 +158,10 @@ button.clicked {
 
 .append-modal-transition {
   transition: opacity 0.4s ease-in;
+}
+
+.remove-modal-transition {
+  transition: opacity 0.4s ease-out;
 }
 
 .hidden {
